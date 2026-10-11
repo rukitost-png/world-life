@@ -7,7 +7,7 @@
 
 ## Executive summary
 
-The repository and engineering baseline are now in place, and automated checks are passing. The original APK was audited read-only; its ZIP integrity and SHA-256 were verified. The audit identifies a subset of compressed asset wrappers and confirms that the file extensions do not reliably describe payload types.
+The repository and engineering baseline are now in place, and automated checks are passing. The original APK was audited read-only; its ZIP integrity and SHA-256 were verified. Focused native disassembly plus a second-level payload probe now identifies a nested `text1000` texture structure in 113 mapdata resources, including a consistent 28-byte header and a `width × height × 2` byte-size invariant.
 
 This is a **technical baseline and planning milestone, not a completed game build**. No new asset has yet passed import/runtime validation, and no modified APK has been built, signed, installed, or tested. Those steps remain blocked by incomplete legacy format semantics and missing Android build/device tooling.
 
@@ -23,9 +23,9 @@ This is a **technical baseline and planning milestone, not a completed game buil
 8. **Wrapper probe** — 344 SMF files matched the NBC-0100 + little-endian size + zlib pattern with matching decoded sizes; 26 SMF files were direct PNG data; 42 SMF files remain unclassified. All 25 NBC files matched the wrapper pattern. No wrapper decompression failures or decoded-size mismatches were observed.
 9. **Native symbol triage** — the ARM library exports map, object-placement, coordinate conversion, zoom, render, texture loading, and map-load-related symbols. This is symbol evidence, not a full decompilation or runtime call trace.
 10. **Automation** — catalog and wrapper tests are present; the latest GitHub Actions run passed.
-11. **Native loader disassembly v0.2** — focused ARM Thumb disassembly traced map-data loading through package/external resource lookup, NBC decompression, SHA-256 checksum validation, and indexed cache acceptance. It also confirmed native map coordinate conversion functions; exact grid constants and the EFILE path table remain unresolved.
-12. **Mapdata resource coverage** — 235 indexed `res/raw/mapdataNNN.smf` entries (000–234); 105 share one identical 721-byte wrapper/decoded PNG, and 130 are larger by file size. Aggregate-only findings are in `reports/apk_mapdata_resource_probe.json`; no per-file payloads were committed.
-13. **Repeatable mapdata audit** — the read-only audit tool now reports indexed mapdata coverage, missing indices, decoded-type counts, and duplicate container fingerprints without listing individual resource paths. A new synthetic-archive regression test covers index gaps and duplicate grouping.
+11. **Native loader disassembly v0.2** — focused ARM Thumb disassembly traced map-data loading through package/external resource lookup, NBC decompression, SHA-256 checksum validation, and indexed cache acceptance. The checksum comes from indexed object-display metadata; the EFILE path table and checksum update source remain unresolved.
+12. **Nested texture structure** — 235 indexed mapdata resources: 122 decode to PNG and 113 contain a second NBC wrapper that decompresses to `text1000`. All 113 have a 28-byte header and exactly `width × height × 2` bytes after the header. This supports a raw 16-bpp texture hypothesis, but channel packing, alpha behavior, and other header semantics are not yet confirmed. 105 PNG entries share identical 721-byte containers; no per-file payloads were committed.
+13. **Repeatable mapdata audit** — the read-only audit tool now detects nested NBC + `text1000` texture payloads and reports aggregate dimensions, size invariants, index gaps, decoded-type counts, and duplicate container fingerprints without listing individual resource paths. Regression tests cover nested texture recognition, index gaps, and duplicate grouping.
 
 ## Source APK baseline
 
@@ -48,7 +48,7 @@ The master APK has not been modified or committed to this repository.
 - docs/APK_ASSET_FORMAT_FINDINGS.md — archive and wrapper probe results
 - docs/ASSET_IMPORT_COMPATIBILITY_MATRIX.md — observed, hypothesized, and blocked formats
 - docs/NATIVE_RUNTIME_SYMBOL_TRIAGE.md — native symbol/string evidence
-- docs/NATIVE_LOADER_DISASSEMBLY_FINDINGS_v0.2.md — focused native loader disassembly and checksum gate
+- docs/NATIVE_LOADER_DISASSEMBLY_FINDINGS_v0.2.md — focused native loader disassembly, checksum gate, and nested texture structure
 - docs/BUILD_TOOLCHAIN_AND_BLOCKERS.md — environment and signing blockers
 - docs/QA_RELEASE_CHECKLIST.md — release acceptance checklist
 - docs/REPOSITORY_LAYOUT.md — folder plan
@@ -65,15 +65,16 @@ The master APK has not been modified or committed to this repository.
 ## Test status
 
 - Local read-only APK audit: PASS; ZIP integrity passed and no wrapper decompression/declared-size errors were found.
+- Second-level mapdata probe: PASS for 113/113 nested wrappers; inner decoded sizes matched, and all 113 `text1000` payloads matched the 28-byte-header plus `width × height × 2` length invariant.
 - Focused static disassembly: PASS for the targeted symbol functions; this is static analysis only, not a runtime trace or device test.
 - Wrapper unit tests: PASS in local run.
-- Latest GitHub Actions workflow: PASS, run [38146857008](https://github.com/rukitost-png/world-life/actions/runs/38146857008), on commit `977369399bc423a157a73a1543e908836732646f`.
-- Unit test coverage now includes the new mapdata aggregate-audit test; the workflow passed after the change.
+- Latest completed regression workflow: PASS, run [38147221058](https://github.com/rukitost-png/world-life/actions/runs/38147221058), on commit `4fe8aad6863a2d261b7095e4e38395afbc83d090`. It covers the nested texture parser and aggregate mapdata audit; later documentation/report updates also trigger the same guardrail workflow.
 
 ## Explicit blockers — do not treat these as complete
 
 1. **Legacy data formats:** the 42 unclassified SMF files and the opaque decoded binary payloads still need schema analysis.
-2. **Runtime loader path:** focused disassembly now confirms the decompression and SHA-256 checksum gate, but the full `EFILE` enum/path table and checksum-table population/update path remain unresolved.
+2. **Runtime loader path:** focused disassembly confirms the decompression and SHA-256 checksum gate, but the full `EFILE` enum/path table and checksum-table population/update path remain unresolved.
+3. **Texture decoder semantics:** the `text1000` payload size invariant strongly suggests 16-bpp pixels, but channel packing, alpha behavior, color space, row orientation, and the meaning of secondary header fields still require native decoder analysis.
 3. **Camera/scale measurements:** exact projection, zoom range, world units, and object footprint need measurements from reference screenshots/device captures.
 4. **Real assets:** catalog records are planning placeholders. No 3D model, texture, UI pack, or audio asset is marked validated or integrated.
 5. **Import compatibility:** no custom asset has completed a round-trip through the original runtime.
