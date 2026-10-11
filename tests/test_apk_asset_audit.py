@@ -33,7 +33,7 @@ class WrapperFormatTests(unittest.TestCase):
         self.assertEqual(inspect_wrapper(b"not-a-known-format")["wrapper"], "other-signature")
 
     def test_detects_nested_text1000_texture_payload(self):
-        pixels = b"\\x00" * 8
+        pixels = b"\x00" * 8
         texture = (
             b"text1000"
             + struct.pack("<HHHHHHI", 2, 2, 2, 2, 2, 1, 28)
