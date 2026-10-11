@@ -92,7 +92,23 @@ def inspect_nested_texture(data: bytes) -> dict | None:
         offset = record_end
 
     if records == 0 or not textures:
-        return None
+        # Preserve malformed type-2 streams in the report instead of silently
+        # classifying them as opaque binary. A non-type-2 payload still returns
+        # None above/below when no record error was observed.
+        if record_error is None:
+            return None
+        return {
+            "format": "nested-nbc-text1000-texture-stream",
+            "record_type": 2,
+            "record_count": records,
+            "texture_count": len(textures),
+            "inner_size_match_count": inner_size_match_count,
+            "pixel_size_matches_16bpp_count": 0,
+            "records_end_offset": offset,
+            "trailing_data_bytes": max(0, len(data) - offset),
+            "trailing_data_type": "unknown" if offset < len(data) else "none",
+            "record_error": record_error,
+        }
 
     texture_dimensions = collections.Counter(
         (item["texture_width"], item["texture_height"]) for item in textures)
