@@ -25,7 +25,7 @@ def sha256_file(path: Path) -> str:
 
 def inspect_nested_texture(data: bytes) -> dict | None:
     """Probe the nested NBC + text1000 texture structure seen in mapdata resources."""
-    if len(data) < 20 or data[:4] != b"\\x02\\x00\\x00\\x00" or data[8:16] != WRAPPER_MAGIC:
+    if len(data) < 20 or data[:4] != b"\x02\x00\x00\x00" or data[8:16] != WRAPPER_MAGIC:
         return None
     declared = struct.unpack("<I", data[16:20])[0]
     result = {
@@ -68,7 +68,7 @@ def inspect_nested_texture(data: bytes) -> dict | None:
         "field_16": field_16,
         "field_18": field_18,
         "data_offset": data_offset,
-        "tail_is_zero": inner[24:28] == b"\\x00\\x00\\x00\\x00",
+        "tail_is_zero": inner[24:28] == b"\x00\x00\x00\x00",
         "pixel_payload_bytes": max(0, len(inner) - data_offset),
         "expected_pixel_payload_bytes_if_16bpp": width * height * 2,
         "pixel_size_matches_16bpp": (
