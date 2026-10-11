@@ -63,7 +63,7 @@ The 113 `text1000` payloads share the following observed layout:
 | 10–11 | Second dimension | 16-bit little-endian value |
 | 12–13 | Secondary dimension A | 16-bit little-endian value; meaning not confirmed |
 | 14–15 | Secondary dimension B | 16-bit little-endian value; meaning not confirmed |
-| 16–17 | Field A | `2` in all 113 samples; meaning not confirmed |
+| 16–17 | Pixel format code | `2` in all 113 samples; native bytes-per-pixel lookup maps code `2` to 2 bytes/pixel |
 | 18–19 | Field B | `1` in all 113 samples; meaning not confirmed |
 | 20–23 | Payload offset | `28` in all 113 samples |
 | 24–27 | Reserved-looking bytes | Four zero bytes in all 113 samples |
