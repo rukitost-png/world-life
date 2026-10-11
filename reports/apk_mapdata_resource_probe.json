@@ -1,5 +1,5 @@
 {
-  "schema_version": "1.0",
+  "schema_version": "1.1",
   "audit_mode": "read-only-aggregate; no archive member extraction",
   "source_apk": {
     "filename": "World-Life-0.1-BGM-Fun-In-Kyoto-V2.apk",
@@ -12,7 +12,7 @@
     "missing_indices_in_range": [],
     "decoded_type_counts": {
       "png": 122,
-      "opaque-binary": 113
+      "nested-text1000-texture": 113
     },
     "container_size_bytes_721_count": 105,
     "identical_container_groups": [
@@ -27,6 +27,84 @@
     ],
     "larger_or_other_sized_resources": 130,
     "per_file_paths_included": false,
-    "interpretation": "Identical-byte grouping is an archive observation only; it does not prove entries are unused or interchangeable."
+    "interpretation": "113 nested text1000 payloads satisfy the 28-byte-header plus width*height*2 byte-size invariant. This supports a raw 16-bit-per-pixel texture hypothesis, not a complete decoder specification.",
+    "nested_texture_probe": {
+      "texture_count": 113,
+      "inner_size_match_count": 113,
+      "pixel_size_matches_16bpp_count": 113,
+      "header_size_bytes": 28,
+      "data_offset_counts": {
+        "28": 113
+      },
+      "field_16_counts": {
+        "2": 113
+      },
+      "field_18_counts": {
+        "1": 113
+      },
+      "texture_dimensions": [
+        {
+          "width": 256,
+          "height": 256,
+          "count": 35
+        },
+        {
+          "width": 128,
+          "height": 256,
+          "count": 28
+        },
+        {
+          "width": 256,
+          "height": 512,
+          "count": 11
+        },
+        {
+          "width": 128,
+          "height": 128,
+          "count": 9
+        },
+        {
+          "width": 64,
+          "height": 128,
+          "count": 8
+        },
+        {
+          "width": 64,
+          "height": 64,
+          "count": 7
+        },
+        {
+          "width": 256,
+          "height": 128,
+          "count": 5
+        },
+        {
+          "width": 512,
+          "height": 512,
+          "count": 3
+        },
+        {
+          "width": 128,
+          "height": 64,
+          "count": 2
+        },
+        {
+          "width": 64,
+          "height": 256,
+          "count": 2
+        },
+        {
+          "width": 512,
+          "height": 1024,
+          "count": 2
+        },
+        {
+          "width": 512,
+          "height": 256,
+          "count": 1
+        }
+      ],
+      "pixel_format_status": "16-bpp size invariant observed; channel packing, alpha mode, color space, and row orientation not confirmed"
+    }
   }
 }
