@@ -83,7 +83,7 @@ def audit(apk_path: Path) -> dict:
                 continue
             data = archive.read(info.filename)
             result = inspect_wrapper(data)
-            mapdata_match = re.fullmatch(r"res/raw/mapdata(\\d+)\\.smf", info.filename)
+            mapdata_match = re.fullmatch(r"res/raw/mapdata(\d+)\.smf", info.filename)
             if mapdata_match:
                 mapdata_resources.append({
                     "index": int(mapdata_match.group(1)),
