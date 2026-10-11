@@ -58,22 +58,35 @@ class MapdataResourceAuditTests(unittest.TestCase):
         decoded = b"same opaque map data"
         wrapped = WRAPPER_MAGIC + struct.pack("<I", len(decoded)) + zlib.compress(decoded)
         png = PNG_SIG + b"\x00" * 8 + struct.pack(">II", 8, 8)
+        texture = (
+            b"text1000"
+            + struct.pack("<HHHHHHI", 2, 2, 2, 2, 2, 1, 28)
+            + b"\x00" * 4
+            + b"\x00" * 8
+        )
+        inner_wrapper = WRAPPER_MAGIC + struct.pack("<I", len(texture)) + zlib.compress(texture)
+        nested = struct.pack("<II", 2, 1) + inner_wrapper
+        nested_wrapper = WRAPPER_MAGIC + struct.pack("<I", len(nested)) + zlib.compress(nested)
         with tempfile.TemporaryDirectory() as directory:
             apk = Path(directory) / "fixture.apk"
             with zipfile.ZipFile(apk, "w") as archive:
                 archive.writestr("res/raw/mapdata000.smf", wrapped)
                 archive.writestr("res/raw/mapdata001.smf", wrapped)
                 archive.writestr("res/raw/mapdata003.smf", png)
+                archive.writestr("res/raw/mapdata004.smf", nested_wrapper)
             report = audit(apk)
 
         probe = report["mapdata_resource_probe"]
-        self.assertEqual(probe["resource_count"], 3)
-        self.assertEqual((probe["index_min"], probe["index_max"]), (0, 3))
+        self.assertEqual(probe["resource_count"], 4)
+        self.assertEqual((probe["index_min"], probe["index_max"]), (0, 4))
         self.assertEqual(probe["missing_indices_in_range"], [2])
         self.assertFalse(probe["per_file_paths_included"])
         self.assertEqual(probe["duplicate_container_groups"][0]["count"], 2)
         self.assertEqual(probe["decoded_type_counts"]["opaque-binary"], 2)
         self.assertEqual(probe["decoded_type_counts"]["png"], 1)
+        self.assertEqual(probe["decoded_type_counts"]["nested-text1000-texture"], 1)
+        self.assertEqual(probe["nested_texture_probe"]["texture_count"], 1)
+        self.assertEqual(probe["nested_texture_probe"]["pixel_size_matches_16bpp_count"], 1)
 
 
 if __name__ == "__main__":
