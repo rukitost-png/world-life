@@ -24,7 +24,8 @@ This is a **technical baseline and planning milestone, not a completed game buil
 9. **Native symbol triage** — the ARM library exports map, object-placement, coordinate conversion, zoom, render, texture loading, and map-load-related symbols. This is symbol evidence, not a full decompilation or runtime call trace.
 10. **Automation** — catalog and wrapper tests are present; the latest GitHub Actions run passed.
 11. **Native loader disassembly v0.2** — focused ARM Thumb disassembly traced map-data loading through package/external resource lookup, NBC decompression, SHA-256 checksum validation, and indexed cache acceptance. It also confirmed native map coordinate conversion functions; exact grid constants and the EFILE path table remain unresolved.
-12. **Mapdata resource coverage** — 235 indexed `res/raw/mapdataNNN.smf` entries (000–234); 105 share one identical 721-byte wrapper/decoded PNG, and 130 are larger/non-placeholder by file size. No payload was committed.
+12. **Mapdata resource coverage** — 235 indexed `res/raw/mapdataNNN.smf` entries (000–234); 105 share one identical 721-byte wrapper/decoded PNG, and 130 are larger by file size. Aggregate-only findings are in `reports/apk_mapdata_resource_probe.json`; no per-file payloads were committed.
+13. **Repeatable mapdata audit** — the read-only audit tool now reports indexed mapdata coverage, missing indices, decoded-type counts, and duplicate container fingerprints without listing individual resource paths. A new synthetic-archive regression test covers index gaps and duplicate grouping.
 
 ## Source APK baseline
 
@@ -56,7 +57,8 @@ The master APK has not been modified or committed to this repository.
 - tools/audit_apk_assets.py — read-only APK audit utility
 - reports/apk_asset_inventory_metadata.json — aggregate metadata report without per-file paths
 - tests/test_asset_catalog.py — catalog guardrail tests
-- tests/test_apk_asset_audit.py — wrapper-signature unit tests
+- reports/apk_mapdata_resource_probe.json — aggregate indexed mapdata coverage and duplicate fingerprint summary
+- tests/test_apk_asset_audit.py — wrapper-signature and aggregate mapdata-audit unit tests
 - .github/workflows/guardrails.yml — automated test workflow
 - .gitignore — ignores APKs, signing material, secrets, and build artifacts
 
@@ -65,7 +67,8 @@ The master APK has not been modified or committed to this repository.
 - Local read-only APK audit: PASS; ZIP integrity passed and no wrapper decompression/declared-size errors were found.
 - Focused static disassembly: PASS for the targeted symbol functions; this is static analysis only, not a runtime trace or device test.
 - Wrapper unit tests: PASS in local run.
-- Latest GitHub Actions workflow: PASS. The run completed successfully on the current repository head.
+- Latest GitHub Actions workflow: PASS, run [38146857008](https://github.com/rukitost-png/world-life/actions/runs/38146857008), on commit `977369399bc423a157a73a1543e908836732646f`.
+- Unit test coverage now includes the new mapdata aggregate-audit test; the workflow passed after the change.
 
 ## Explicit blockers — do not treat these as complete
 
