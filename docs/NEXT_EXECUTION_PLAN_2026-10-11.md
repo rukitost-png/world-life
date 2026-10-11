@@ -20,10 +20,11 @@ Convert the current static-analysis findings into a controlled, falsifiable inve
 
 ## Progress note — 2026-10-11 follow-up
 
-- Hardened the read-only parser so a malformed first type-2 record is retained as a structured `nested-nbc-unverified` result with a specific error, rather than being silently downgraded to opaque binary.
-- Added synthetic regression cases for invalid record size and missing inner NBC header.
-- These code/test edits have been committed. The current environment cannot reach GitHub from a local shell, and the connector has not exposed a CI status for these new commits; treat the new tests as **added but not yet independently verified in this session**.
-- WP4 remains partial: malformed-first-record diagnostics are improved, but a complete synthetic round-trip fixture and validation against the original runtime are not done.
+- Hardened the read-only parser so malformed first type-2 records remain structured diagnostic results.
+- Added synthetic regression cases for invalid record size, missing inner NBC header, and a valid record followed by a malformed record.
+- Found and fixed a classification gap: a stream with at least one valid texture followed by a malformed record could previously be labeled verified if the valid records satisfied the size invariants. Classification now also requires `record_error` to be absent.
+- The latest code/test edits are committed, but no passing CI result has been independently observed for these commits in this session. Local GitHub access is unavailable, so treat these tests as **added but pending execution/CI confirmation**.
+- WP4 remains partial: synthetic malformed-record diagnostics are improved, but a complete synthetic round-trip fixture and validation against the original runtime are not done.
 
 ## Work packages
 
