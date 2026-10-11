@@ -18,6 +18,13 @@ Convert the current static-analysis findings into a controlled, falsifiable inve
 - `CObjTexManager::LoadMapData(int)` decompresses a resource and compares SHA-256 of the decoded buffer against index-specific object-display metadata before caching it.
 - Unknowns remain: resource path mapping, checksum-table population/update, record-to-object mapping, secondary header fields, row orientation, color-space assumptions, and trailing PNG-signature data.
 
+## Progress note — 2026-10-11 follow-up
+
+- Hardened the read-only parser so a malformed first type-2 record is retained as a structured `nested-nbc-unverified` result with a specific error, rather than being silently downgraded to opaque binary.
+- Added synthetic regression cases for invalid record size and missing inner NBC header.
+- These code/test edits have been committed. The current environment cannot reach GitHub from a local shell, and the connector has not exposed a CI status for these new commits; treat the new tests as **added but not yet independently verified in this session**.
+- WP4 remains partial: malformed-first-record diagnostics are improved, but a complete synthetic round-trip fixture and validation against the original runtime are not done.
+
 ## Work packages
 
 ### WP1 — Map resource index to display metadata
