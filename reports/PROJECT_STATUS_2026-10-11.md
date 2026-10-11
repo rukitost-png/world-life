@@ -24,7 +24,7 @@ This is a **technical baseline and planning milestone, not a completed game buil
 9. **Native symbol triage** — the ARM library exports map, object-placement, coordinate conversion, zoom, render, texture loading, and map-load-related symbols. This is symbol evidence, not a full decompilation or runtime call trace.
 10. **Automation** — catalog and wrapper tests are present; the latest GitHub Actions run passed.
 11. **Native loader disassembly v0.2** — focused ARM Thumb disassembly traced map-data loading through package/external resource lookup, NBC decompression, SHA-256 checksum validation, and indexed cache acceptance. The checksum comes from indexed object-display metadata; the EFILE path table and checksum update source remain unresolved.
-12. **Nested texture structure** — 235 indexed mapdata resources: 122 decode to PNG and 113 contain a second NBC wrapper that decompresses to `text1000`. All 113 have a 28-byte header and exactly `width × height × 2` bytes after the header. This supports a raw 16-bpp texture hypothesis, but channel packing, alpha behavior, and other header semantics are not yet confirmed. 105 PNG entries share identical 721-byte containers; no per-file payloads were committed.
+12. **Nested texture structure** — 235 indexed mapdata resources: 122 decode to PNG and 113 contain a second NBC wrapper that decompresses to `text1000`. Native `CNblTexture` code maps header format code `2` to 2 bytes per pixel, confirming the exact `width × height × 2` payload length in all 113 samples. Channel packing, alpha behavior, and other header semantics remain unconfirmed. 105 PNG entries share identical 721-byte containers; no per-file payloads were committed.
 13. **Repeatable mapdata audit** — the read-only audit tool now detects nested NBC + `text1000` texture payloads and reports aggregate dimensions, size invariants, index gaps, decoded-type counts, and duplicate container fingerprints without listing individual resource paths. Regression tests cover nested texture recognition, index gaps, and duplicate grouping.
 
 ## Source APK baseline
@@ -68,7 +68,7 @@ The master APK has not been modified or committed to this repository.
 - Second-level mapdata probe: PASS for 113/113 nested wrappers; inner decoded sizes matched, and all 113 `text1000` payloads matched the 28-byte-header plus `width × height × 2` length invariant.
 - Focused static disassembly: PASS for the targeted symbol functions; this is static analysis only, not a runtime trace or device test.
 - Wrapper unit tests: PASS in local run.
-- Latest completed regression workflow: PASS, run [38147221058](https://github.com/rukitost-png/world-life/actions/runs/38147221058), on commit `4fe8aad6863a2d261b7095e4e38395afbc83d090`. It covers the nested texture parser and aggregate mapdata audit; later documentation/report updates also trigger the same guardrail workflow.
+- Latest completed guardrail workflow: PASS, run [38147343732](https://github.com/rukitost-png/world-life/actions/runs/38147343732), on commit `c1cfe936d1da5a8c84e33e8e4fe934066d67bc3a`. It covers the nested texture parser and aggregate mapdata audit; subsequent changes were documentation-only.
 
 ## Explicit blockers — do not treat these as complete
 
