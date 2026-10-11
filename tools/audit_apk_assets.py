@@ -189,6 +189,7 @@ def inspect_wrapper(data: bytes) -> dict:
                 result["nested_payload"] = nested
                 if (nested.get("texture_magic") == "text1000"
                         and nested.get("texture_count", 0) > 0
+                        and nested.get("record_error") is None
                         and nested.get("inner_size_match_count") == nested.get("texture_count")
                         and nested.get("pixel_size_matches_16bpp_count") == nested.get("texture_count")):
                     result["decoded_type"] = "nested-text1000-texture-stream"
