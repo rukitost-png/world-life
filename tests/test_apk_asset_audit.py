@@ -47,6 +47,24 @@ class WrapperFormatTests(unittest.TestCase):
         self.assertEqual(result["decoded_type"], "nested-nbc-unverified")
         self.assertEqual(result["nested_payload"]["record_error"], "missing-inner-nbc-header")
 
+    def test_does_not_certify_stream_with_later_malformed_record(self):
+        texture = (
+            b"text1000"
+            + struct.pack("<HHHHHHI", 2, 2, 2, 2, 2, 1, 28)
+            + bytes(4)
+            + bytes(8)
+        )
+        inner_wrapper = WRAPPER_MAGIC + struct.pack("<I", len(texture)) + zlib.compress(texture)
+        valid_record = struct.pack("<II", 2, len(inner_wrapper)) + inner_wrapper
+        malformed_record = struct.pack("<II", 2, 0) + bytes(12)
+        nested = valid_record + malformed_record
+        wrapped = WRAPPER_MAGIC + struct.pack("<I", len(nested)) + zlib.compress(nested)
+
+        result = inspect_wrapper(wrapped)
+        self.assertEqual(result["decoded_type"], "nested-nbc-unverified")
+        self.assertEqual(result["nested_payload"]["texture_count"], 1)
+        self.assertEqual(result["nested_payload"]["record_error"], "invalid-record-size")
+
     def test_detects_nested_text1000_texture_payload(self):
         pixels = b"\x00" * 8
         texture = (
