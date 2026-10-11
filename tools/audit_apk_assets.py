@@ -5,6 +5,7 @@ import argparse
 import collections
 import hashlib
 import json
+import re
 import struct
 import zipfile
 import zlib
@@ -67,6 +68,7 @@ def audit(apk_path: Path) -> dict:
     decoded_type_counts = collections.Counter()
     png_dimensions = collections.Counter()
     wrapper_errors = []
+    mapdata_resources = []
     with zipfile.ZipFile(apk_path, "r") as archive:
         bad_member = archive.testzip()
         file_count = 0
@@ -79,7 +81,16 @@ def audit(apk_path: Path) -> dict:
             size_by_extension[ext] += info.file_size
             if ext not in {".smf", ".nbc", ".png", ".ogg"}:
                 continue
-            result = inspect_wrapper(archive.read(info.filename))
+            data = archive.read(info.filename)
+            result = inspect_wrapper(data)
+            mapdata_match = re.fullmatch(r"res/raw/mapdata(\\d+)\\.smf", info.filename)
+            if mapdata_match:
+                mapdata_resources.append({
+                    "index": int(mapdata_match.group(1)),
+                    "size_bytes": info.file_size,
+                    "sha256": hashlib.sha256(data).hexdigest(),
+                    "decoded_type": result.get("decoded_type"),
+                })
             signature_counts[f"{ext}:{result['wrapper']}"] += 1
             if result.get("decoded_type"):
                 decoded_type_counts[f"{ext}:{result['decoded_type']}"] += 1
@@ -87,8 +98,30 @@ def audit(apk_path: Path) -> dict:
                 png_dimensions[tuple(result["png_dimensions"])] += 1
             if result.get("decompression") == "error" or result.get("size_matches") is False:
                 wrapper_errors.append({"extension": ext, **result})
+    mapdata_indices = sorted(item["index"] for item in mapdata_resources)
+    mapdata_size_counts = collections.Counter(item["size_bytes"] for item in mapdata_resources)
+    mapdata_type_counts = collections.Counter(item["decoded_type"] or "unknown" for item in mapdata_resources)
+    mapdata_hash_groups = collections.Counter(
+        (item["size_bytes"], item["sha256"]) for item in mapdata_resources)
+    duplicate_mapdata_groups = [
+        {"size_bytes": size, "sha256": digest, "count": count}
+        for (size, digest), count in mapdata_hash_groups.most_common()
+        if count > 1
+    ]
+    mapdata_probe = {
+        "resource_count": len(mapdata_resources),
+        "index_min": min(mapdata_indices) if mapdata_indices else None,
+        "index_max": max(mapdata_indices) if mapdata_indices else None,
+        "missing_indices_in_range": (
+            sorted(set(range(mapdata_indices[0], mapdata_indices[-1] + 1)) - set(mapdata_indices))
+            if mapdata_indices else []),
+        "size_counts": dict(sorted(mapdata_size_counts.items())),
+        "decoded_type_counts": dict(sorted(mapdata_type_counts.items())),
+        "duplicate_container_groups": duplicate_mapdata_groups[:20],
+        "per_file_paths_included": False,
+    }
     return {
-        "schema_version": "1.0",
+        "schema_version": "1.1",
         "audit_mode": "read-only-aggregate; no archive member extraction",
         "apk": {"filename": apk_path.name, "size_bytes": apk_path.stat().st_size,
                 "sha256": sha256_file(apk_path),
@@ -98,6 +131,7 @@ def audit(apk_path: Path) -> dict:
                     "zip_entry_count_including_directories": len(archive.infolist()),
                     "extension_counts": dict(sorted(extension_counts.items())),
                     "uncompressed_bytes_by_extension": dict(sorted(size_by_extension.items()))},
+        "mapdata_resource_probe": mapdata_probe,
         "format_probe": {
             "signature_counts": dict(sorted(signature_counts.items())),
             "decoded_type_counts": dict(sorted(decoded_type_counts.items())),
