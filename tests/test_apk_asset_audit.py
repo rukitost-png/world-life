@@ -32,6 +32,21 @@ class WrapperFormatTests(unittest.TestCase):
     def test_unknown_signature_is_not_misclassified(self):
         self.assertEqual(inspect_wrapper(b"not-a-known-format")["wrapper"], "other-signature")
 
+    def test_reports_malformed_first_type2_record_size(self):
+        malformed = struct.pack("<II", 2, 0) + b"\\x00" * 12
+        wrapped = WRAPPER_MAGIC + struct.pack("<I", len(malformed)) + zlib.compress(malformed)
+        result = inspect_wrapper(wrapped)
+        self.assertEqual(result["decoded_type"], "nested-nbc-unverified")
+        self.assertEqual(result["nested_payload"]["record_error"], "invalid-record-size")
+        self.assertEqual(result["nested_payload"]["record_count"], 0)
+
+    def test_reports_missing_inner_wrapper_on_first_type2_record(self):
+        malformed = struct.pack("<II", 2, 12) + b"\\x00" * 12
+        wrapped = WRAPPER_MAGIC + struct.pack("<I", len(malformed)) + zlib.compress(malformed)
+        result = inspect_wrapper(wrapped)
+        self.assertEqual(result["decoded_type"], "nested-nbc-unverified")
+        self.assertEqual(result["nested_payload"]["record_error"], "missing-inner-nbc-header")
+
     def test_detects_nested_text1000_texture_payload(self):
         pixels = b"\x00" * 8
         texture = (
