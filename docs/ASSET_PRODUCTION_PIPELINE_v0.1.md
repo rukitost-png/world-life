@@ -16,16 +16,20 @@ This pipeline remains engine-agnostic until the target runtime and original asse
 4. **Export**
    - Use an interchange format only when useful (for example PNG, WAV, or glTF); do not call it runtime-compatible until import is verified.
    - Record tool/version, scale, axis orientation, texture color space, compression, and export settings.
-5. **Automated validation**
+5. **Format-specific export gate (legacy map textures, experimental only)**
+   - Static analysis has identified an outer NBC wrapper, an inner NBC wrapper, and a `text1000` texture payload with a 28-byte header. Native code maps header format code `2` to 2 bytes per pixel.
+   - Do not produce release assets from this partial specification: channel packing, alpha behavior, color space, row orientation, secondary header fields, and the resource-index/checksum update path remain unresolved.
+   - The native loader checks SHA-256 over the first decompressed resource buffer against index-specific object-display metadata. A wrapper that decompresses successfully is not enough.
+6. **Automated validation**
    - Check file existence, naming and ID uniqueness, dimensions, size limits, and required metadata.
    - Verify provenance and license fields.
-6. **Import round-trip**
+7. **Import round-trip**
    - Import into the actual target runtime/toolchain.
    - Confirm materials, texture orientation, scale, pivots, animation, and collision.
-7. **Visual and runtime QA**
+8. **Visual and runtime QA**
    - Review at the intended gameplay camera and device aspect ratio.
    - Check draw calls, memory, loading time, and lower-end device behavior where possible.
-8. **Integration and release**
+9. **Integration and release**
    - Mark an asset `integrated` only after runtime verification.
    - Attach evidence: screenshots/video, test log, version/hash, reviewer, and date.
 
