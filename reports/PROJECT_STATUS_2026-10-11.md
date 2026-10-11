@@ -75,12 +75,12 @@ The master APK has not been modified or committed to this repository.
 1. **Legacy data formats:** the 42 unclassified SMF files and the opaque decoded binary payloads still need schema analysis.
 2. **Runtime loader path:** focused disassembly confirms the decompression and SHA-256 checksum gate, but the full `EFILE` enum/path table and checksum-table population/update path remain unresolved.
 3. **Texture decoder semantics:** the `text1000` payload size invariant strongly suggests 16-bpp pixels, but channel packing, alpha behavior, color space, row orientation, and the meaning of secondary header fields still require native decoder analysis.
-3. **Camera/scale measurements:** exact projection, zoom range, world units, and object footprint need measurements from reference screenshots/device captures.
-4. **Real assets:** catalog records are planning placeholders. No 3D model, texture, UI pack, or audio asset is marked validated or integrated.
-5. **Import compatibility:** no custom asset has completed a round-trip through the original runtime.
-6. **Android build environment:** apktool, aapt, d8, apksigner, adb, jadx, baksmali, Android SDK, and emulator/device tooling were not available during the audit.
-7. **Signing continuity:** the original private signing keystore was not found. A new signing key cannot be assumed to match the original app.
-8. **Runtime regression:** login, server, purchase, install/upgrade, and in-game behavior have not been tested with a modified APK.
+4. **Camera/scale measurements:** exact projection, zoom range, world units, and object footprint need measurements from reference screenshots/device captures.
+5. **Real assets:** catalog records are planning placeholders. No 3D model, texture, UI pack, or audio asset is marked validated or integrated.
+6. **Import compatibility:** no custom asset has completed a round-trip through the original runtime.
+7. **Android build environment:** apktool, aapt, d8, apksigner, adb, jadx, baksmali, Android SDK, and emulator/device tooling were not available during the audit.
+8. **Signing continuity:** the original private signing keystore was not found. A new signing key cannot be assumed to match the original app.
+9. **Runtime regression:** login, server, purchase, install/upgrade, and in-game behavior have not been tested with a modified APK.
 
 ## Next execution sequence
 
