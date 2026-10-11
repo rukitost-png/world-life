@@ -41,7 +41,7 @@ class WrapperFormatTests(unittest.TestCase):
             + pixels
         )
         inner_wrapper = WRAPPER_MAGIC + struct.pack("<I", len(texture)) + zlib.compress(texture)
-        nested = struct.pack("<II", 2, 1) + inner_wrapper
+        nested = struct.pack("<II", 2, len(inner_wrapper)) + inner_wrapper
         outer_wrapper = WRAPPER_MAGIC + struct.pack("<I", len(nested)) + zlib.compress(nested)
 
         result = inspect_wrapper(outer_wrapper)
@@ -65,7 +65,7 @@ class MapdataResourceAuditTests(unittest.TestCase):
             + b"\x00" * 8
         )
         inner_wrapper = WRAPPER_MAGIC + struct.pack("<I", len(texture)) + zlib.compress(texture)
-        nested = struct.pack("<II", 2, 1) + inner_wrapper
+        nested = struct.pack("<II", 2, len(inner_wrapper)) + inner_wrapper
         nested_wrapper = WRAPPER_MAGIC + struct.pack("<I", len(nested)) + zlib.compress(nested)
         with tempfile.TemporaryDirectory() as directory:
             apk = Path(directory) / "fixture.apk"
