@@ -1,15 +1,19 @@
 # World Life — Dukku
 
-Repository baseline for original game assets, a repeatable asset-production pipeline, and project guardrails.
+Repository baseline for original game assets, read-only APK format research, and repeatable project guardrails.
 
 ## Start here
 - [Project Charter](docs/PROJECT_CHARTER.md)
 - [Asset Production Pipeline v0.1](docs/ASSET_PRODUCTION_PIPELINE_v0.1.md)
-- [Repository Layout](docs/REPOSITORY_LAYOUT.md)
 - [Asset Catalog v0.1](assets/catalog/asset-catalog-v0.1.json)
+- [APK Asset Format Findings](docs/APK_ASSET_FORMAT_FINDINGS.md)
+- [Asset Import Compatibility Matrix](docs/ASSET_IMPORT_COMPATIBILITY_MATRIX.md)
+- [QA and Release Checklist](docs/QA_RELEASE_CHECKLIST.md)
+- [Build Toolchain and Blockers](docs/BUILD_TOOLCHAIN_AND_BLOCKERS.md)
+- [Repository Layout](docs/REPOSITORY_LAYOUT.md)
 
 ## Current status
-The catalog contains planning placeholders only. They are not finished or importable game assets. The target runtime and import format must be verified before compatibility can be claimed.
+The catalog contains 17 planning entries. They are not finished or importable game assets. The read-only APK probe confirms archive integrity and a subset of container signatures, but not the complete binary formats or runtime compatibility.
 
 ## Project boundaries
 - Keep the master APK unchanged and treat it as a read-only reference.
@@ -18,5 +22,9 @@ The catalog contains planning placeholders only. They are not finished or import
 - Record asset provenance and license before import.
 - Never claim build, signing, installation, or runtime tests that have not actually succeeded.
 
+## Tools
+- tools/audit_apk_assets.py generates aggregate APK metadata and probes known signatures without extracting archive members.
+- Run automated checks with: python -m unittest discover -s tests -v.
+
 ## Automated checks
-GitHub Actions runs the asset catalog guardrail tests on pushes, pull requests, and manual dispatch.
+GitHub Actions runs the test suite on pushes, pull requests, and manual dispatch.
