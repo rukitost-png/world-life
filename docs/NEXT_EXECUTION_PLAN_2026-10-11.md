@@ -21,8 +21,9 @@ Convert the current static-analysis findings into a controlled, falsifiable inve
 ## Progress note — 2026-10-11 follow-up
 
 - Hardened the read-only parser so malformed first type-2 records remain structured diagnostic results.
-- Added synthetic regression cases for invalid record size, missing inner NBC header, and a valid record followed by a malformed record.
+- Added synthetic regression cases for invalid record size, missing inner NBC header, a truncated type-2 record header, and a valid record followed by a malformed record.
 - Found and fixed a classification gap: a stream with at least one valid texture followed by a malformed record could previously be labeled verified if the valid records satisfied the size invariants. Classification now also requires `record_error` to be absent.
+- Short type-2 payloads are now retained for diagnostics instead of being ignored solely because they are shorter than 20 bytes.
 - The latest code/test edits are committed, but no passing CI result has been independently observed for these commits in this session. Local GitHub access is unavailable, so treat these tests as **added but pending execution/CI confirmation**.
 - WP4 remains partial: synthetic malformed-record diagnostics are improved, but a complete synthetic round-trip fixture and validation against the original runtime are not done.
 
