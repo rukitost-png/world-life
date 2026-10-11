@@ -96,7 +96,7 @@ class MapdataResourceAuditTests(unittest.TestCase):
         self.assertEqual(probe["decoded_type_counts"]["nested-text1000-texture-stream"], 1)
         self.assertEqual(probe["nested_texture_probe"]["texture_record_count"], 2)
         self.assertEqual(probe["nested_texture_probe"]["pixel_size_matches_16bpp_count"], 2)
-        self.assertEqual(probe["nested_texture_probe"]["trailing_png_signature_stream_count"], 1)
+        self.assertEqual(probe["nested_texture_probe"]["trailing_png_stream_count"], 1)
 
 
 if __name__ == "__main__":
