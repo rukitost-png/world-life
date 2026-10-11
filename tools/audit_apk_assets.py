@@ -23,6 +23,61 @@ def sha256_file(path: Path) -> str:
     return h.hexdigest()
 
 
+def inspect_nested_texture(data: bytes) -> dict | None:
+    """Probe the nested NBC + text1000 texture structure seen in mapdata resources."""
+    if len(data) < 20 or data[:4] != b"\\x02\\x00\\x00\\x00" or data[8:16] != WRAPPER_MAGIC:
+        return None
+    declared = struct.unpack("<I", data[16:20])[0]
+    result = {
+        "format": "nested-nbc-text1000",
+        "outer_version": struct.unpack("<I", data[:4])[0],
+        "inner_declared_size": declared,
+        "inner_decoded_size": None,
+        "inner_size_matches": None,
+        "texture_magic": None,
+        "texture_width": None,
+        "texture_height": None,
+        "content_width": None,
+        "content_height": None,
+        "field_16": None,
+        "field_18": None,
+        "data_offset": None,
+        "tail_is_zero": None,
+        "pixel_payload_bytes": None,
+        "expected_pixel_payload_bytes_if_16bpp": None,
+        "pixel_size_matches_16bpp": None,
+    }
+    try:
+        inner = zlib.decompress(data[20:])
+    except zlib.error as exc:
+        result["decompression_error"] = str(exc)
+        return result
+    result["inner_decoded_size"] = len(inner)
+    result["inner_size_matches"] = len(inner) == declared
+    if not inner.startswith(b"text1000") or len(inner) < 28:
+        result["texture_magic"] = inner[:8].decode("ascii", errors="replace")
+        return result
+    width, height, content_width, content_height, field_16, field_18 = struct.unpack("<HHHHHH", inner[8:20])
+    data_offset = struct.unpack("<I", inner[20:24])[0]
+    result.update({
+        "texture_magic": "text1000",
+        "texture_width": width,
+        "texture_height": height,
+        "content_width": content_width,
+        "content_height": content_height,
+        "field_16": field_16,
+        "field_18": field_18,
+        "data_offset": data_offset,
+        "tail_is_zero": inner[24:28] == b"\\x00\\x00\\x00\\x00",
+        "pixel_payload_bytes": max(0, len(inner) - data_offset),
+        "expected_pixel_payload_bytes_if_16bpp": width * height * 2,
+        "pixel_size_matches_16bpp": (
+            data_offset == 28 and len(inner) - data_offset == width * height * 2
+        ),
+    })
+    return result
+
+
 def inspect_wrapper(data: bytes) -> dict:
     result = {"wrapper": "unknown", "decompression": "not-attempted",
               "declared_size": None, "decoded_size": None,
@@ -54,6 +109,15 @@ def inspect_wrapper(data: bytes) -> dict:
                 result["decoded_type"] = "zip"
             else:
                 result["decoded_type"] = "opaque-binary"
+            nested = inspect_nested_texture(decoded)
+            if nested is not None:
+                result["nested_payload"] = nested
+                if (nested.get("texture_magic") == "text1000"
+                        and nested.get("inner_size_matches")
+                        and nested.get("pixel_size_matches_16bpp")):
+                    result["decoded_type"] = "nested-text1000-texture"
+                else:
+                    result["decoded_type"] = "nested-nbc-unverified"
         except zlib.error as exc:
             result.update(decompression="error", error=str(exc))
         return result
