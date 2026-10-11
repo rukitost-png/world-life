@@ -45,7 +45,7 @@ class WrapperFormatTests(unittest.TestCase):
         outer_wrapper = WRAPPER_MAGIC + struct.pack("<I", len(nested)) + zlib.compress(nested)
 
         result = inspect_wrapper(outer_wrapper)
-        self.assertEqual(result["decoded_type"], "nested-text1000-texture")
+        self.assertEqual(result["decoded_type"], "nested-text1000-texture-stream")
         self.assertTrue(result["nested_payload"]["inner_size_matches"])
         self.assertEqual(result["nested_payload"]["texture_width"], 2)
         self.assertEqual(result["nested_payload"]["texture_height"], 2)
@@ -84,7 +84,7 @@ class MapdataResourceAuditTests(unittest.TestCase):
         self.assertEqual(probe["duplicate_container_groups"][0]["count"], 2)
         self.assertEqual(probe["decoded_type_counts"]["opaque-binary"], 2)
         self.assertEqual(probe["decoded_type_counts"]["png"], 1)
-        self.assertEqual(probe["decoded_type_counts"]["nested-text1000-texture"], 1)
+        self.assertEqual(probe["decoded_type_counts"]["nested-text1000-texture-stream"], 1)
         self.assertEqual(probe["nested_texture_probe"]["texture_count"], 1)
         self.assertEqual(probe["nested_texture_probe"]["pixel_size_matches_16bpp_count"], 1)
 
