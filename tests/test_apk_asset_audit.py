@@ -37,7 +37,7 @@ class MapdataResourceAuditTests(unittest.TestCase):
     def test_aggregates_index_range_and_duplicate_fingerprints_without_paths(self):
         decoded = b"same opaque map data"
         wrapped = WRAPPER_MAGIC + struct.pack("<I", len(decoded)) + zlib.compress(decoded)
-        png = PNG_SIG + b"\\x00" * 8 + struct.pack(">II", 8, 8)
+        png = PNG_SIG + b"\x00" * 8 + struct.pack(">II", 8, 8)
         with tempfile.TemporaryDirectory() as directory:
             apk = Path(directory) / "fixture.apk"
             with zipfile.ZipFile(apk, "w") as archive:
