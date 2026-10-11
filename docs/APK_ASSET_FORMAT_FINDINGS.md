@@ -42,7 +42,7 @@ A deeper, in-memory probe of the 235 indexed `res/raw/mapdataNNN.smf` entries fo
 - 122 entries decode after the outer wrapper to PNG data. Of these, 105 entries share the same 721-byte wrapper and identical decoded PNG bytes; 17 other entries decode to distinct PNG data.
 - The other 113 entries decode to an 8-byte prefix followed by a second `nbc 0100` wrapper. Decompressing that second wrapper yields a `text1000` payload in all 113 cases.
 - Each `text1000` payload has a 28-byte header. The two 16-bit header dimensions imply a pixel payload of exactly `width × height × 2` bytes for all 113 samples. The two subsequent 16-bit values and header field at offset 20 are recorded by the audit but not semantically named beyond their observed values.
-- The `text1000` layout is therefore a strong candidate for a raw 16-bit-per-pixel texture container. Exact pixel format (channel packing, alpha behavior, color space), and the semantic meaning of all header fields still need native decoder confirmation.
+- Native disassembly now confirms the `text1000` decoder uses header field 16 as a color-format code and looks up bytes-per-pixel in `[1, 1, 2, 2, 4]`. All 113 samples use code `2`, which the native lookup maps to 2 bytes per pixel. The exact channel packing, alpha behavior, color space, and semantic meaning of the secondary dimensions remain unknown.
 - The audit tool now detects this nested structure and aggregates dimensions and size checks without recording individual resource paths.
 
 ## Interpretation limits
