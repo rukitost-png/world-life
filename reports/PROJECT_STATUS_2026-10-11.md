@@ -64,7 +64,7 @@ The master APK has not been modified or committed to this repository.
 
 ## Follow-up hardening — 2026-10-11
 
-The parser now preserves malformed first type-2 mapdata records as structured diagnostic output, including invalid record-size and missing-inner-wrapper cases. Two synthetic regression tests were added. The previously recorded passing CI run predates these newest edits; this session could not independently confirm a new workflow run, so the new tests are pending CI confirmation.
+The parser now preserves malformed first type-2 mapdata records as structured diagnostic output, including invalid record-size and missing-inner-wrapper cases. A further regression case covers a valid record followed by a malformed record. During review, a classification gap was found and fixed: partially parsed streams can no longer be labeled verified merely because the records parsed before the error satisfy the size invariants. The previously recorded passing CI run predates these newest edits; this session could not independently confirm a new workflow run, so the new tests are pending CI confirmation.
 
 ## Test status
 
