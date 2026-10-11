@@ -23,6 +23,8 @@ This is a **technical baseline and planning milestone, not a completed game buil
 8. **Wrapper probe** — 344 SMF files matched the NBC-0100 + little-endian size + zlib pattern with matching decoded sizes; 26 SMF files were direct PNG data; 42 SMF files remain unclassified. All 25 NBC files matched the wrapper pattern. No wrapper decompression failures or decoded-size mismatches were observed.
 9. **Native symbol triage** — the ARM library exports map, object-placement, coordinate conversion, zoom, render, texture loading, and map-load-related symbols. This is symbol evidence, not a full decompilation or runtime call trace.
 10. **Automation** — catalog and wrapper tests are present; the latest GitHub Actions run passed.
+11. **Native loader disassembly v0.2** — focused ARM Thumb disassembly traced map-data loading through package/external resource lookup, NBC decompression, SHA-256 checksum validation, and indexed cache acceptance. It also confirmed native map coordinate conversion functions; exact grid constants and the EFILE path table remain unresolved.
+12. **Mapdata resource coverage** — 235 indexed `res/raw/mapdataNNN.smf` entries (000–234); 105 share one identical 721-byte wrapper/decoded PNG, and 130 are larger/non-placeholder by file size. No payload was committed.
 
 ## Source APK baseline
 
@@ -45,6 +47,7 @@ The master APK has not been modified or committed to this repository.
 - docs/APK_ASSET_FORMAT_FINDINGS.md — archive and wrapper probe results
 - docs/ASSET_IMPORT_COMPATIBILITY_MATRIX.md — observed, hypothesized, and blocked formats
 - docs/NATIVE_RUNTIME_SYMBOL_TRIAGE.md — native symbol/string evidence
+- docs/NATIVE_LOADER_DISASSEMBLY_FINDINGS_v0.2.md — focused native loader disassembly and checksum gate
 - docs/BUILD_TOOLCHAIN_AND_BLOCKERS.md — environment and signing blockers
 - docs/QA_RELEASE_CHECKLIST.md — release acceptance checklist
 - docs/REPOSITORY_LAYOUT.md — folder plan
@@ -60,13 +63,14 @@ The master APK has not been modified or committed to this repository.
 ## Test status
 
 - Local read-only APK audit: PASS; ZIP integrity passed and no wrapper decompression/declared-size errors were found.
+- Focused static disassembly: PASS for the targeted symbol functions; this is static analysis only, not a runtime trace or device test.
 - Wrapper unit tests: PASS in local run.
 - Latest GitHub Actions workflow: PASS. The run completed successfully on the current repository head.
 
 ## Explicit blockers — do not treat these as complete
 
 1. **Legacy data formats:** the 42 unclassified SMF files and the opaque decoded binary payloads still need schema analysis.
-2. **Runtime loader path:** native symbol evidence is not yet a call graph; loader/resource lookup behavior needs focused disassembly or runtime tracing.
+2. **Runtime loader path:** focused disassembly now confirms the decompression and SHA-256 checksum gate, but the full `EFILE` enum/path table and checksum-table population/update path remain unresolved.
 3. **Camera/scale measurements:** exact projection, zoom range, world units, and object footprint need measurements from reference screenshots/device captures.
 4. **Real assets:** catalog records are planning placeholders. No 3D model, texture, UI pack, or audio asset is marked validated or integrated.
 5. **Import compatibility:** no custom asset has completed a round-trip through the original runtime.
