@@ -43,7 +43,31 @@ The static implementation supports the existing Python audit's wrapper interpret
 - `CObjectDataManager::Initialize()` at `0x0021ea50` invokes `CBin2CSV::Initialize(EFILE)` repeatedly and consumes typed fields (`GetUINT`, `GetUSHORT`, `GetINT`, `SkipString`) while constructing object-display metadata. The binary contains the log string `[InitializeDisplayData] Invalid number of hash checksums(%d)` and the resource-name string `maptexinfo.dat`.
 - This strongly indicates that checksum expectations are part of initialized object-display metadata, but the exact `EFILE` value/source table that supplies the relevant checksum records is not yet mapped. Do not assume `maptexinfo.dat` is the sole or confirmed source without resolving the enum/path mapping.
 
-### 4. Package resources and external/patch resources
+### 4. Second-level mapdata texture payload
+
+A second, in-memory probe of all 235 `res/raw/mapdataNNN.smf` resources found two broad outer-decoded groups:
+
+- 122 decode directly to PNG data. A group of 105 entries share identical 721-byte containers and identical decoded PNG bytes; this byte identity alone does not establish that the entries are unused.
+- 113 decode to an 8-byte prefix followed by a second `nbc 0100` wrapper. All 113 inner wrappers decompress to a payload beginning with ASCII `text1000`.
+
+The 113 `text1000` payloads share the following observed layout:
+
+| Offset | Observed field | Finding |
+|---:|---|---|
+| 0–7 | Magic | ASCII `text1000` |
+| 8–9 | First dimension | 16-bit little-endian value |
+| 10–11 | Second dimension | 16-bit little-endian value |
+| 12–13 | Secondary dimension A | 16-bit little-endian value; meaning not confirmed |
+| 14–15 | Secondary dimension B | 16-bit little-endian value; meaning not confirmed |
+| 16–17 | Field A | `2` in all 113 samples; meaning not confirmed |
+| 18–19 | Field B | `1` in all 113 samples; meaning not confirmed |
+| 20–23 | Payload offset | `28` in all 113 samples |
+| 24–27 | Reserved-looking bytes | Four zero bytes in all 113 samples |
+| 28 onward | Pixel-like payload | Exactly `first dimension × second dimension × 2` bytes in all 113 samples |
+
+The exact size invariant is strong evidence for a raw 16-bit-per-pixel texture payload. It does **not** identify the channel packing, alpha mode, color space, row orientation, or the meaning of the secondary dimensions and fields A/B. Those semantics require tracing the native texture reader (including the `text1000` consumer) and should not be guessed when writing production assets.
+
+### 5. Package resources and external/patch resources
 
 - `CAppResourceManager::ReadFile(EFILE, char**, int*)`: `0x000bf448`
 - `CAppResourceManager::ReadFileFromPackage(...)`: `0x000bf324`
@@ -53,7 +77,7 @@ The static implementation supports the existing Python audit's wrapper interpret
 
 The APK contains Android raw resources named `res/raw/mapdataNNN.smf` (235 indexed entries for indices 000–234). A follow-up archive probe found 105 entries with a 721-byte container; all 105 have the same container SHA-256 and decode to the same 19,020-byte PNG. The remaining 130 entries are larger by file size. The native library also contains logical filename strings such as `mapdata%02d.nbc` and checksum/texture error messages. These observations are consistent with a resource abstraction that can use different package and logical names; they do not prove the names are interchangeable in every code path.
 
-### 5. Map coordinate conversion
+### 6. Map coordinate conversion
 
 - `CMapDataManager::GetMapPos(S2DPointF&, float, float)`: `0x00217434`
 - `CMapDataManager::GetMapIndex(S2DPoint&, int, int)`: `0x002176e0`
