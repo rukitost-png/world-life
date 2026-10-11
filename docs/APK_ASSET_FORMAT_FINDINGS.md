@@ -35,15 +35,17 @@ This document summarizes a read-only archive and signature probe. It does not pu
 - The APK has 235 `res/raw/mapdataNNN.smf` entries for indices 000–234. Of these, 105 entries are 721-byte wrappers with identical container SHA-256 and identical decoded SHA-256; their decoded payload is a 19,020-byte PNG. The other 130 entries are non-placeholder by size. This is a byte-pattern observation, not proof that the identical PNG entries are unused or interchangeable.
 - See [Native Loader Disassembly Findings v0.2](NATIVE_LOADER_DISASSEMBLY_FINDINGS_v0.2.md) for symbols, addresses, call path, and remaining unknowns.
 
-## Second-level mapdata payload probe
+## Second-level mapdata record and texture probe
 
-A deeper, in-memory probe of the 235 indexed `res/raw/mapdataNNN.smf` entries found:
+A deeper, in-memory probe of all 235 indexed mapdata resources found:
 
-- 122 entries decode after the outer wrapper to PNG data. Of these, 105 entries share the same 721-byte wrapper and identical decoded PNG bytes; 17 other entries decode to distinct PNG data.
-- The other 113 entries decode to an 8-byte prefix followed by a second `nbc 0100` wrapper. Decompressing that second wrapper yields a `text1000` payload in all 113 cases.
-- Each `text1000` payload has a 28-byte header. The two 16-bit header dimensions imply a pixel payload of exactly `width × height × 2` bytes for all 113 samples. The two subsequent 16-bit values and header field at offset 20 are recorded by the audit but not semantically named beyond their observed values.
-- Native disassembly now confirms the `text1000` decoder uses header field 16 as a color-format code and looks up bytes-per-pixel in `[1, 1, 2, 2, 4]`. All 113 samples use code `2`, which the native lookup maps to 2 bytes per pixel. The exact channel packing, alpha behavior, color space, and semantic meaning of the secondary dimensions remain unknown.
-- The audit tool now detects this nested structure and aggregates dimensions and size checks without recording individual resource paths.
+- 122 resources decode after the outer NBC wrapper to PNG data. Of these, 105 share an identical 721-byte wrapper and identical decoded PNG bytes.
+- 113 resources decode to concatenated type-2 records, totaling 1,605 records. Each record contains a 32-bit type value (2), a 32-bit byte length, and a nested NBC wrapper of exactly that length.
+- All 1,605 nested payloads begin with text1000 and have a 28-byte header. The texture width/height are followed by two secondary dimensions, format code 2, field value 1, a data offset of 28, and four zero bytes. The pixel payload length equals width × height × 2 for every record.
+- Native disassembly confirms RGBA4444: the reader uses GL_RGBA (0x1908) with GL_UNSIGNED_SHORT_4_4_4_4 (0x8033), and the bytes-per-pixel lookup maps format code 2 to two bytes per pixel.
+- 55 record streams contain additional trailing bytes that begin with a PNG signature (2×2 dimensions); substantial bytes follow the PNG IEND chunk, so this region is not yet understood as a standalone PNG.
+
+The audit tool now parses all type-2 records, aggregates texture dimensions and length checks, and avoids recording individual resource paths. This still does not prove that a newly authored resource can be loaded by the original runtime: record offsets, secondary header semantics, trailing data, and the checksum/metadata update path remain unresolved.
 
 ## Interpretation limits
 This is a useful lead, not a complete format specification. It does not decode map/object semantics, identify every payload schema, or prove newly authored assets can be imported by the original runtime. File extensions alone are not reliable format identifiers. No extracted proprietary payload was committed as a game asset.
