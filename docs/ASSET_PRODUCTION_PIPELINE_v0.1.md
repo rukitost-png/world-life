@@ -18,7 +18,7 @@ This pipeline remains engine-agnostic until the target runtime and original asse
    - Record tool/version, scale, axis orientation, texture color space, compression, and export settings.
 5. **Format-specific export gate (legacy map textures, experimental only)**
    - Static analysis has identified an outer NBC wrapper, an inner NBC wrapper, and a `text1000` texture payload with a 28-byte header. Native code maps header format code `2` to 2 bytes per pixel.
-   - Do not produce release assets from this partial specification: channel packing, alpha behavior, color space, row orientation, secondary header fields, and the resource-index/checksum update path remain unresolved.
+   - The native upload path confirms RGBA4444 (GL_RGBA + GL_UNSIGNED_SHORT_4_4_4_4), but row orientation, color-space/gamma assumptions, secondary header fields, trailing PNG-signature regions, and the resource-index/checksum update path remain unresolved. Do not produce release assets from this partial specification.
    - The native loader checks SHA-256 over the first decompressed resource buffer against index-specific object-display metadata. A wrapper that decompresses successfully is not enough.
 6. **Automated validation**
    - Check file existence, naming and ID uniqueness, dimensions, size limits, and required metadata.
