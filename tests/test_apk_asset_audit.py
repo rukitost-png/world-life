@@ -1,7 +1,10 @@
 import struct
+import tempfile
 import unittest
+import zipfile
 import zlib
-from tools.audit_apk_assets import inspect_wrapper, PNG_SIG, WRAPPER_MAGIC
+from pathlib import Path
+from tools.audit_apk_assets import audit, inspect_wrapper, PNG_SIG, WRAPPER_MAGIC
 
 
 class WrapperFormatTests(unittest.TestCase):
@@ -28,6 +31,29 @@ class WrapperFormatTests(unittest.TestCase):
 
     def test_unknown_signature_is_not_misclassified(self):
         self.assertEqual(inspect_wrapper(b"not-a-known-format")["wrapper"], "other-signature")
+
+
+class MapdataResourceAuditTests(unittest.TestCase):
+    def test_aggregates_index_range_and_duplicate_fingerprints_without_paths(self):
+        decoded = b"same opaque map data"
+        wrapped = WRAPPER_MAGIC + struct.pack("<I", len(decoded)) + zlib.compress(decoded)
+        png = PNG_SIG + b"\\x00" * 8 + struct.pack(">II", 8, 8)
+        with tempfile.TemporaryDirectory() as directory:
+            apk = Path(directory) / "fixture.apk"
+            with zipfile.ZipFile(apk, "w") as archive:
+                archive.writestr("res/raw/mapdata000.smf", wrapped)
+                archive.writestr("res/raw/mapdata001.smf", wrapped)
+                archive.writestr("res/raw/mapdata003.smf", png)
+            report = audit(apk)
+
+        probe = report["mapdata_resource_probe"]
+        self.assertEqual(probe["resource_count"], 3)
+        self.assertEqual((probe["index_min"], probe["index_max"]), (0, 3))
+        self.assertEqual(probe["missing_indices_in_range"], [2])
+        self.assertFalse(probe["per_file_paths_included"])
+        self.assertEqual(probe["duplicate_container_groups"][0]["count"], 2)
+        self.assertEqual(probe["decoded_type_counts"]["opaque-binary"], 2)
+        self.assertEqual(probe["decoded_type_counts"]["png"], 1)
 
 
 if __name__ == "__main__":
