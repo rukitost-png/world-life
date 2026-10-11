@@ -7,7 +7,7 @@
 
 ## Executive summary
 
-The repository and engineering baseline are now in place, and automated checks are passing. The original APK was audited read-only; its ZIP integrity and SHA-256 were verified. Focused native disassembly plus a second-level payload probe now identifies a nested `text1000` texture structure in 113 mapdata resources, including a consistent 28-byte header and a `width × height × 2` byte-size invariant.
+The repository and engineering baseline are now in place, and automated checks are passing. The original APK was audited read-only; its ZIP integrity and SHA-256 were verified. Focused native disassembly plus a second-level payload probe now identifies 1,605 nested `text1000` texture records across 113 mapdata streams. The native upload path confirms RGBA4444 (GL_RGBA + GL_UNSIGNED_SHORT_4_4_4_4), with a consistent 28-byte header and a `width × height × 2` byte-size invariant.
 
 This is a **technical baseline and planning milestone, not a completed game build**. No new asset has yet passed import/runtime validation, and no modified APK has been built, signed, installed, or tested. Those steps remain blocked by incomplete legacy format semantics and missing Android build/device tooling.
 
@@ -24,7 +24,7 @@ This is a **technical baseline and planning milestone, not a completed game buil
 9. **Native symbol triage** — the ARM library exports map, object-placement, coordinate conversion, zoom, render, texture loading, and map-load-related symbols. This is symbol evidence, not a full decompilation or runtime call trace.
 10. **Automation** — catalog and wrapper tests are present; the latest GitHub Actions run passed.
 11. **Native loader disassembly v0.2** — focused ARM Thumb disassembly traced map-data loading through package/external resource lookup, NBC decompression, SHA-256 checksum validation, and indexed cache acceptance. The checksum comes from indexed object-display metadata; the EFILE path table and checksum update source remain unresolved.
-12. **Nested texture structure** — 235 indexed mapdata resources: 122 decode to PNG and 113 contain a second NBC wrapper that decompresses to `text1000`. Native `CNblTexture` code maps header format code `2` to 2 bytes per pixel, confirming the exact `width × height × 2` payload length in all 113 samples. Channel packing, alpha behavior, and other header semantics remain unconfirmed. 105 PNG entries share identical 721-byte containers; no per-file payloads were committed.
+12. **Nested texture structure** — 235 indexed mapdata resources: 122 decode to PNG and 113 contain concatenated type-2 records, totaling 1,605 nested NBC + `text1000` textures. Native code confirms RGBA4444 uploads; all 1,605 records satisfy the 28-byte-header plus `width × height × 2` invariant. Secondary dimensions, row orientation, and color-space/gamma assumptions remain unresolved. 55 streams also contain trailing bytes beginning with a 2×2 PNG signature; their purpose is unknown. 105 PNG entries share identical 721-byte containers; no per-file payloads were committed.
 13. **Repeatable mapdata audit** — the read-only audit tool now detects nested NBC + `text1000` texture payloads and reports aggregate dimensions, size invariants, index gaps, decoded-type counts, and duplicate container fingerprints without listing individual resource paths. Regression tests cover nested texture recognition, index gaps, and duplicate grouping.
 
 ## Source APK baseline
@@ -68,13 +68,13 @@ The master APK has not been modified or committed to this repository.
 - Second-level mapdata probe: PASS for 113/113 nested wrappers; inner decoded sizes matched, and all 113 `text1000` payloads matched the 28-byte-header plus `width × height × 2` length invariant.
 - Focused static disassembly: PASS for the targeted symbol functions; this is static analysis only, not a runtime trace or device test.
 - Wrapper unit tests: PASS in local run.
-- Latest completed guardrail workflow: PASS, run [38147343732](https://github.com/rukitost-png/world-life/actions/runs/38147343732), on commit `c1cfe936d1da5a8c84e33e8e4fe934066d67bc3a`. It covers the nested texture parser and aggregate mapdata audit; subsequent changes were documentation-only.
+- Latest completed code regression workflow: PASS, run [38147590968](https://github.com/rukitost-png/world-life/actions/runs/38147590968), on commit `a606647cb6417e96eae4e515d0fc2bcf4a240b60`. It covers nested texture stream parsing and aggregate mapdata audit; subsequent changes were documentation/report updates.
 
 ## Explicit blockers — do not treat these as complete
 
 1. **Legacy data formats:** the 42 unclassified SMF files and the opaque decoded binary payloads still need schema analysis.
 2. **Runtime loader path:** focused disassembly confirms the decompression and SHA-256 checksum gate, but the full `EFILE` enum/path table and checksum-table population/update path remain unresolved.
-3. **Texture decoder semantics:** the `text1000` payload size invariant strongly suggests 16-bpp pixels, but channel packing, alpha behavior, color space, row orientation, and the meaning of secondary header fields still require native decoder analysis.
+3. **Texture decoder semantics:** RGBA4444 is confirmed, but row orientation, color-space/gamma assumptions, secondary header fields, and the 55 trailing PNG-signature regions remain unresolved.
 4. **Camera/scale measurements:** exact projection, zoom range, world units, and object footprint need measurements from reference screenshots/device captures.
 5. **Real assets:** catalog records are planning placeholders. No 3D model, texture, UI pack, or audio asset is marked validated or integrated.
 6. **Import compatibility:** no custom asset has completed a round-trip through the original runtime.
@@ -84,8 +84,8 @@ The master APK has not been modified or committed to this repository.
 
 ## Next execution sequence
 
-1. Use ARM-aware disassembly or a suitable Android reverse-engineering toolchain to trace map and texture loading.
-2. Identify the schema for one representative map record and one texture/object record without rewriting the master APK.
+1. Resolve object-display offsets into the 1,605-record mapdata streams and determine what the 55 trailing PNG-signature regions represent.
+2. Trace the expected-checksum table update/patch path before designing any replacement-resource writer.
 3. Build a tiny non-production parser/round-trip fixture and test it against a known sample.
 4. Measure camera and grid scale from controlled reference captures; then fill the actual unit/axis/pivot fields in the catalog.
 5. Produce one original low-risk asset first, with editable source, license/provenance, export settings, and import/runtime evidence.
