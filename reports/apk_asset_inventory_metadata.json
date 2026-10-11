@@ -1,0 +1,163 @@
+{
+  "schema_version": "1.0",
+  "audit_mode": "read-only-aggregate; no archive member extraction",
+  "apk": {
+    "filename": "World-Life-0.1-BGM-Fun-In-Kyoto-V2.apk",
+    "size_bytes": 56840959,
+    "sha256": "36727d1a1ac1b5f1e997efe8c312f1de7945bd6d13c91651a2b195e588185ca1",
+    "zip_test": "pass",
+    "bad_member": null
+  },
+  "archive": {
+    "file_count": 641,
+    "zip_entry_count_including_directories": 670,
+    "extension_counts": {
+      ".apk": 1,
+      ".arsc": 1,
+      ".default": 2,
+      ".dex": 1,
+      ".html": 2,
+      ".jpg": 1,
+      ".map": 3,
+      ".mf": 2,
+      ".nbc": 25,
+      ".ogg": 21,
+      ".png": 129,
+      ".properties": 2,
+      ".provider": 3,
+      ".providers": 1,
+      ".rsa": 1,
+      ".sf": 1,
+      ".smf": 412,
+      ".so": 2,
+      ".xml": 28,
+      "[no-extension]": 3
+    }
+  },
+  "format_probe": {
+    "signature_counts": {
+      ".nbc:nbc-0100-plus-zlib": 25,
+      ".ogg:direct-ogg": 21,
+      ".png:direct-png": 129,
+      ".smf:direct-png": 26,
+      ".smf:nbc-0100-plus-zlib": 344,
+      ".smf:other-signature": 42
+    },
+    "decoded_type_counts": {
+      ".nbc:opaque-binary": 25,
+      ".ogg:ogg": 21,
+      ".png:png": 129,
+      ".smf:opaque-binary": 221,
+      ".smf:png": 149
+    },
+    "png_dimensions_top_20": [
+      {
+        "width": 2,
+        "height": 2,
+        "count": 123
+      },
+      {
+        "width": 32,
+        "height": 32,
+        "count": 10
+      },
+      {
+        "width": 72,
+        "height": 72,
+        "count": 9
+      },
+      {
+        "width": 30,
+        "height": 30,
+        "count": 8
+      },
+      {
+        "width": 90,
+        "height": 30,
+        "count": 8
+      },
+      {
+        "width": 91,
+        "height": 30,
+        "count": 4
+      },
+      {
+        "width": 85,
+        "height": 23,
+        "count": 4
+      },
+      {
+        "width": 64,
+        "height": 64,
+        "count": 4
+      },
+      {
+        "width": 256,
+        "height": 64,
+        "count": 4
+      },
+      {
+        "width": 48,
+        "height": 48,
+        "count": 4
+      },
+      {
+        "width": 62,
+        "height": 62,
+        "count": 4
+      },
+      {
+        "width": 40,
+        "height": 37,
+        "count": 4
+      },
+      {
+        "width": 140,
+        "height": 42,
+        "count": 4
+      },
+      {
+        "width": 36,
+        "height": 36,
+        "count": 4
+      },
+      {
+        "width": 36,
+        "height": 35,
+        "count": 3
+      },
+      {
+        "width": 20,
+        "height": 20,
+        "count": 3
+      },
+      {
+        "width": 2,
+        "height": 30,
+        "count": 3
+      },
+      {
+        "width": 34,
+        "height": 29,
+        "count": 2
+      },
+      {
+        "width": 151,
+        "height": 30,
+        "count": 2
+      },
+      {
+        "width": 15,
+        "height": 15,
+        "count": 2
+      }
+    ],
+    "wrapper_errors_count": 0,
+    "smf_and_nbc_observations": {
+      "smf_files": 412,
+      "nbc_files": 25,
+      "interpretation": "A subset uses an nbc 0100 header, a little-endian declared decoded size, and zlib payload. Decoded content is mixed; this is not a complete format specification."
+    }
+  },
+  "entry_details_included": false
+}
