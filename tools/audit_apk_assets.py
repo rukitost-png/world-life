@@ -23,43 +23,12 @@ def sha256_file(path: Path) -> str:
     return h.hexdigest()
 
 
-def inspect_nested_texture(data: bytes) -> dict | None:
-    """Probe the nested NBC + text1000 texture structure seen in mapdata resources."""
-    if len(data) < 20 or data[:4] != b"\x02\x00\x00\x00" or data[8:16] != WRAPPER_MAGIC:
-        return None
-    declared = struct.unpack("<I", data[16:20])[0]
-    result = {
-        "format": "nested-nbc-text1000",
-        "outer_version": struct.unpack("<I", data[:4])[0],
-        "inner_declared_size": declared,
-        "inner_decoded_size": None,
-        "inner_size_matches": None,
-        "texture_magic": None,
-        "texture_width": None,
-        "texture_height": None,
-        "content_width": None,
-        "content_height": None,
-        "field_16": None,
-        "field_18": None,
-        "data_offset": None,
-        "tail_is_zero": None,
-        "pixel_payload_bytes": None,
-        "expected_pixel_payload_bytes_if_16bpp": None,
-        "pixel_size_matches_16bpp": None,
-    }
-    try:
-        inner = zlib.decompress(data[20:])
-    except zlib.error as exc:
-        result["decompression_error"] = str(exc)
-        return result
-    result["inner_decoded_size"] = len(inner)
-    result["inner_size_matches"] = len(inner) == declared
+def _inspect_text1000(inner: bytes) -> dict | None:
     if not inner.startswith(b"text1000") or len(inner) < 28:
-        result["texture_magic"] = inner[:8].decode("ascii", errors="replace")
-        return result
+        return None
     width, height, content_width, content_height, field_16, field_18 = struct.unpack("<HHHHHH", inner[8:20])
     data_offset = struct.unpack("<I", inner[20:24])[0]
-    result.update({
+    return {
         "texture_magic": "text1000",
         "texture_width": width,
         "texture_height": height,
@@ -74,6 +43,96 @@ def inspect_nested_texture(data: bytes) -> dict | None:
         "pixel_size_matches_16bpp": (
             data_offset == 28 and len(inner) - data_offset == width * height * 2
         ),
+    }
+
+
+def inspect_nested_texture(data: bytes) -> dict | None:
+    """Parse concatenated type-2 records containing nested NBC + text1000 textures."""
+    if len(data) < 20 or struct.unpack("<I", data[:4])[0] != 2:
+        return None
+
+    offset = 0
+    records = 0
+    textures = []
+    inner_size_match_count = 0
+    record_error = None
+    while offset < len(data):
+        if offset + 8 > len(data):
+            record_error = "truncated-record-header"
+            break
+        record_type, record_size = struct.unpack("<II", data[offset:offset + 8])
+        if record_type != 2:
+            break
+        record_end = offset + 8 + record_size
+        if record_size < 12 or record_end > len(data):
+            record_error = "invalid-record-size"
+            break
+        wrapped = data[offset + 8:record_end]
+        if wrapped[:8] != WRAPPER_MAGIC:
+            record_error = "missing-inner-nbc-header"
+            break
+        declared = struct.unpack("<I", wrapped[8:12])[0]
+        try:
+            inner = zlib.decompress(wrapped[12:])
+        except zlib.error:
+            record_error = "inner-decompression-error"
+            break
+        records += 1
+        inner_size_match_count += int(len(inner) == declared)
+        texture = _inspect_text1000(inner)
+        if texture is None:
+            record_error = "inner-payload-not-text1000"
+            offset = record_end
+            break
+        texture["inner_declared_size"] = declared
+        texture["inner_decoded_size"] = len(inner)
+        texture["inner_size_matches"] = len(inner) == declared
+        texture["record_size_bytes"] = record_size
+        textures.append(texture)
+        offset = record_end
+
+    if records == 0 or not textures:
+        return None
+
+    texture_dimensions = collections.Counter(
+        (item["texture_width"], item["texture_height"]) for item in textures)
+    content_dimensions = collections.Counter(
+        (item["content_width"], item["content_height"]) for item in textures)
+    data_offset_counts = collections.Counter(str(item["data_offset"]) for item in textures)
+    field_16_counts = collections.Counter(str(item["field_16"]) for item in textures)
+    field_18_counts = collections.Counter(str(item["field_18"]) for item in textures)
+    tail = data[offset:]
+    if not tail:
+        trailing_data_type = "none"
+    elif tail.startswith(PNG_SIG):
+        trailing_data_type = "png"
+    else:
+        trailing_data_type = "unknown"
+
+    result = dict(textures[0])
+    result.update({
+        "format": "nested-nbc-text1000-texture-stream",
+        "record_type": 2,
+        "record_count": records,
+        "texture_count": len(textures),
+        "inner_size_match_count": inner_size_match_count,
+        "pixel_size_matches_16bpp_count": sum(
+            item["pixel_size_matches_16bpp"] for item in textures),
+        "data_offset_counts": dict(sorted(data_offset_counts.items())),
+        "field_16_counts": dict(sorted(field_16_counts.items())),
+        "field_18_counts": dict(sorted(field_18_counts.items())),
+        "texture_dimensions": [
+            {"width": w, "height": h, "count": n}
+            for (w, h), n in texture_dimensions.most_common()
+        ],
+        "content_dimensions": [
+            {"width": w, "height": h, "count": n}
+            for (w, h), n in content_dimensions.most_common()
+        ],
+        "records_end_offset": offset,
+        "trailing_data_bytes": len(tail),
+        "trailing_data_type": trailing_data_type,
+        "record_error": record_error,
     })
     return result
 
@@ -113,9 +172,10 @@ def inspect_wrapper(data: bytes) -> dict:
             if nested is not None:
                 result["nested_payload"] = nested
                 if (nested.get("texture_magic") == "text1000"
-                        and nested.get("inner_size_matches")
-                        and nested.get("pixel_size_matches_16bpp")):
-                    result["decoded_type"] = "nested-text1000-texture"
+                        and nested.get("texture_count", 0) > 0
+                        and nested.get("inner_size_match_count") == nested.get("texture_count")
+                        and nested.get("pixel_size_matches_16bpp_count") == nested.get("texture_count")):
+                    result["decoded_type"] = "nested-text1000-texture-stream"
                 else:
                     result["decoded_type"] = "nested-nbc-unverified"
         except zlib.error as exc:
@@ -190,26 +250,33 @@ def audit(apk_path: Path) -> dict:
         if item.get("nested_payload") is not None
         and item["nested_payload"].get("texture_magic") == "text1000"
     ]
-    texture_dimensions = collections.Counter(
-        (item["texture_width"], item["texture_height"])
-        for item in nested_textures
-        if item.get("texture_width") is not None and item.get("texture_height") is not None
-    )
-    content_dimensions = collections.Counter(
-        (item["content_width"], item["content_height"])
-        for item in nested_textures
-        if item.get("content_width") is not None and item.get("content_height") is not None
-    )
+    texture_dimensions = collections.Counter()
+    content_dimensions = collections.Counter()
+    data_offset_counts = collections.Counter()
+    field_16_counts = collections.Counter()
+    field_18_counts = collections.Counter()
+    for item in nested_textures:
+        texture_dimensions.update({
+            (entry["width"], entry["height"]): entry["count"]
+            for entry in item.get("texture_dimensions", [])
+        })
+        content_dimensions.update({
+            (entry["width"], entry["height"]): entry["count"]
+            for entry in item.get("content_dimensions", [])
+        })
+        data_offset_counts.update(item.get("data_offset_counts", {}))
+        field_16_counts.update(item.get("field_16_counts", {}))
+        field_18_counts.update(item.get("field_18_counts", {}))
     mapdata_probe["nested_texture_probe"] = {
-        "texture_count": len(nested_textures),
-        "inner_size_match_count": sum(item.get("inner_size_matches") is True for item in nested_textures),
-        "pixel_size_matches_16bpp_count": sum(item.get("pixel_size_matches_16bpp") is True for item in nested_textures),
-        "data_offset_counts": dict(sorted(collections.Counter(
-            str(item.get("data_offset")) for item in nested_textures).items())),
-        "field_16_counts": dict(sorted(collections.Counter(
-            str(item.get("field_16")) for item in nested_textures).items())),
-        "field_18_counts": dict(sorted(collections.Counter(
-            str(item.get("field_18")) for item in nested_textures).items())),
+        "texture_stream_count": len(nested_textures),
+        "texture_record_count": sum(item.get("texture_count", 0) for item in nested_textures),
+        "inner_size_match_count": sum(item.get("inner_size_match_count", 0) for item in nested_textures),
+        "pixel_size_matches_16bpp_count": sum(item.get("pixel_size_matches_16bpp_count", 0) for item in nested_textures),
+        "trailing_png_stream_count": sum(item.get("trailing_data_type") == "png" for item in nested_textures),
+        "trailing_data_bytes_total": sum(item.get("trailing_data_bytes", 0) for item in nested_textures),
+        "data_offset_counts": dict(sorted(data_offset_counts.items())),
+        "field_16_counts": dict(sorted(field_16_counts.items())),
+        "field_18_counts": dict(sorted(field_18_counts.items())),
         "texture_dimensions_top_20": [
             {"width": w, "height": h, "count": n}
             for (w, h), n in texture_dimensions.most_common(20)
