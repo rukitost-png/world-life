@@ -1,0 +1,32 @@
+{
+  "schema_version": "1.0",
+  "audit_mode": "read-only-aggregate; no archive member extraction",
+  "source_apk": {
+    "filename": "World-Life-0.1-BGM-Fun-In-Kyoto-V2.apk",
+    "sha256": "36727d1a1ac1b5f1e997efe8c312f1de7945bd6d13c91651a2b195e588185ca1"
+  },
+  "mapdata_resources": {
+    "count": 235,
+    "index_min": 0,
+    "index_max": 234,
+    "missing_indices_in_range": [],
+    "decoded_type_counts": {
+      "png": 122,
+      "opaque-binary": 113
+    },
+    "container_size_bytes_721_count": 105,
+    "identical_container_groups": [
+      {
+        "size_bytes": 721,
+        "sha256": "39d1d5b6198a9ad76433a11656d41187d308e39eb868bea617542abc4678cb97",
+        "count": 105,
+        "decoded_size_bytes": 19020,
+        "decoded_sha256": "f233b042117d59db2b43fa031afe3df334909725cec176a6325962346e9e2026",
+        "decoded_type": "png"
+      }
+    ],
+    "larger_or_other_sized_resources": 130,
+    "per_file_paths_included": false,
+    "interpretation": "Identical-byte grouping is an archive observation only; it does not prove entries are unused or interchangeable."
+  }
+}
