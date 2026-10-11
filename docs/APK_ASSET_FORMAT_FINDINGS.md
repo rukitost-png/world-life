@@ -27,6 +27,14 @@ This document summarizes a read-only archive and signature probe. It does not pu
 - All 129 direct PNG files and all 21 Ogg files had their expected file signatures.
 - No wrapper decompression failures or declared-size mismatches were observed.
 
+## Native loader follow-up (static disassembly, 2026-10-11)
+
+- Focused ARM Thumb disassembly confirms `CNBCompressFile::CheckHeader` checks the `nbc 0100` magic/version words and `UncompressAllocate` reads the declared decoded size at byte offset 8, then inflates bytes beginning at offset 12.
+- `CObjTexManager::LoadMapData(int)` calls the resource manager, decompresses the bytes, calculates SHA-256 over the decoded payload, and compares it with an index-specific checksum returned by `CObjectDataManager::GetObjDisplayHashChecksum(int)`. A wrapper-only match is therefore insufficient for compatibility.
+- `CAppResourceManager::ReadFile` has both package and external/save-data resource paths, with patch-manager state involved. The complete `EFILE` to Android resource-path table remains unresolved.
+- The APK has 235 `res/raw/mapdataNNN.smf` entries for indices 000–234. Of these, 105 entries are 721-byte wrappers with identical container SHA-256 and identical decoded SHA-256; their decoded payload is a 19,020-byte PNG. The other 130 entries are non-placeholder by size. This is a byte-pattern observation, not proof that the identical PNG entries are unused or interchangeable.
+- See [Native Loader Disassembly Findings v0.2](NATIVE_LOADER_DISASSEMBLY_FINDINGS_v0.2.md) for symbols, addresses, call path, and remaining unknowns.
+
 ## Interpretation limits
 This is a useful lead, not a complete format specification. It does not decode map/object semantics, identify every payload schema, or prove newly authored assets can be imported by the original runtime. File extensions alone are not reliable format identifiers. No extracted proprietary payload was committed as a game asset.
 
