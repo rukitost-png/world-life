@@ -36,7 +36,14 @@ The loader path is now clearer than symbol/string triage alone. The native objec
 
 The static implementation supports the existing Python audit's wrapper interpretation. It does **not** establish that every opaque decoded payload has the same internal schema.
 
-### 3. Package resources and external/patch resources
+### 3. Expected checksum table
+
+- Accessor: `CObjectDataManager::GetObjDisplayHashChecksum(int)` at `0x0021e308`.
+- The accessor bounds-checks the requested index against a manager-held count, returns the corresponding pointer from an indexed checksum array, and has a special case for an airport checksum when the index equals the count.
+- `CObjectDataManager::Initialize()` at `0x0021ea50` invokes `CBin2CSV::Initialize(EFILE)` repeatedly and consumes typed fields (`GetUINT`, `GetUSHORT`, `GetINT`, `SkipString`) while constructing object-display metadata. The binary contains the log string `[InitializeDisplayData] Invalid number of hash checksums(%d)` and the resource-name string `maptexinfo.dat`.
+- This strongly indicates that checksum expectations are part of initialized object-display metadata, but the exact `EFILE` value/source table that supplies the relevant checksum records is not yet mapped. Do not assume `maptexinfo.dat` is the sole or confirmed source without resolving the enum/path mapping.
+
+### 4. Package resources and external/patch resources
 
 - `CAppResourceManager::ReadFile(EFILE, char**, int*)`: `0x000bf448`
 - `CAppResourceManager::ReadFileFromPackage(...)`: `0x000bf324`
@@ -46,7 +53,7 @@ The static implementation supports the existing Python audit's wrapper interpret
 
 The APK contains Android raw resources named `res/raw/mapdataNNN.smf` (235 indexed entries for indices 000–234). A follow-up archive probe found 105 entries with a 721-byte container; all 105 have the same container SHA-256 and decode to the same 19,020-byte PNG. The remaining 130 entries are larger by file size. The native library also contains logical filename strings such as `mapdata%02d.nbc` and checksum/texture error messages. These observations are consistent with a resource abstraction that can use different package and logical names; they do not prove the names are interchangeable in every code path.
 
-### 4. Map coordinate conversion
+### 5. Map coordinate conversion
 
 - `CMapDataManager::GetMapPos(S2DPointF&, float, float)`: `0x00217434`
 - `CMapDataManager::GetMapIndex(S2DPoint&, int, int)`: `0x002176e0`
@@ -68,7 +75,7 @@ The symbol spellings above are the Itanium C++ ABI names reported by this binary
 
 **Supported by disassembly**
 - The native loader uses the 12-byte NBC header and a decompression step.
-- Map-data acceptance includes a SHA-256 comparison against an index-specific expected checksum.
+- Map-data acceptance includes a SHA-256 comparison against an index-specific expected checksum held by `CObjectDataManager`.
 - Package and external resource-read paths both exist.
 - Map-to-screen and map-to-index conversions are native functions.
 
