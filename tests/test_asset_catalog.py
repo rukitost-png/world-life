@@ -28,6 +28,13 @@ class AssetCatalogGuardrails(unittest.TestCase):
             for dependency in asset["dependencies"]:
                 self.assertIn(dependency, known_ids, f"{asset['id']} -> {dependency}")
 
+    def test_catalog_schema_is_valid_json(self):
+        schema_path = ROOT / "assets" / "catalog" / "asset-catalog.schema.json"
+        schema = json.loads(schema_path.read_text(encoding="utf-8"))
+        self.assertEqual(schema["title"], "World Life Dukku Asset Catalog")
+        self.assertIn("assets", schema["properties"])
+        self.assertIn("required", schema["properties"]["assets"]["items"])
+
     def test_charter_preserves_project_boundaries(self):
         charter = (ROOT / "docs" / "PROJECT_CHARTER.md").read_text(encoding="utf-8")
         self.assertIn("master APK unchanged", charter)
