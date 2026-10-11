@@ -10,6 +10,10 @@ Repository baseline for original game assets, read-only APK format research, and
 - [Asset Import Compatibility Matrix](docs/ASSET_IMPORT_COMPATIBILITY_MATRIX.md)
 - [QA and Release Checklist](docs/QA_RELEASE_CHECKLIST.md)
 - [Build Toolchain and Blockers](docs/BUILD_TOOLCHAIN_AND_BLOCKERS.md)
+- [Native Runtime Symbol Triage](docs/NATIVE_RUNTIME_SYMBOL_TRIAGE.md)
+- [Camera and Scale Study](docs/CAMERA_AND_SCALE_STUDY.md)
+- [Asset Brief Template](docs/ASSET_BRIEF_TEMPLATE.md)
+- [Catalog JSON Schema](assets/catalog/asset-catalog.schema.json)
 - [Repository Layout](docs/REPOSITORY_LAYOUT.md)
 
 ## Current status
