@@ -1,5 +1,5 @@
 {
-  "schema_version": "1.0",
+  "schema_version": "1.1",
   "audit_mode": "read-only-aggregate; no archive member extraction",
   "apk": {
     "filename": "World-Life-0.1-BGM-Fun-In-Kyoto-V2.apk",
@@ -47,8 +47,9 @@
       ".nbc:opaque-binary": 25,
       ".ogg:ogg": 21,
       ".png:png": 129,
-      ".smf:opaque-binary": 221,
-      ".smf:png": 149
+      ".smf:opaque-binary": 108,
+      ".smf:png": 149,
+      ".smf:nested-text1000-texture": 113
     },
     "png_dimensions_top_20": [
       {
@@ -156,8 +157,53 @@
     "smf_and_nbc_observations": {
       "smf_files": 412,
       "nbc_files": 25,
-      "interpretation": "A subset uses an nbc 0100 header, a little-endian declared decoded size, and zlib payload. Decoded content is mixed; this is not a complete format specification."
+      "interpretation": "The first-level nbc 0100 wrapper is confirmed for a subset. A follow-up nested probe identified 113 mapdata payloads containing a second nbc 0100 wrapper and a text1000 texture record; this is not a complete pixel-format or runtime-import specification."
     }
   },
-  "entry_details_included": false
+  "entry_details_included": false,
+  "mapdata_resource_probe": {
+    "resource_count": 235,
+    "index_min": 0,
+    "index_max": 234,
+    "missing_indices_in_range": [],
+    "decoded_type_counts": {
+      "png": 122,
+      "nested-text1000-texture": 113
+    },
+    "duplicate_container_groups": [
+      {
+        "size_bytes": 721,
+        "sha256": "39d1d5b6198a9ad76433a11656d41187d308e39eb868bea617542abc4678cb97",
+        "count": 105
+      }
+    ],
+    "nested_texture_probe": {
+      "texture_count": 113,
+      "inner_size_match_count": 113,
+      "pixel_size_matches_16bpp_count": 113,
+      "header_size_bytes": 28,
+      "data_offset": 28,
+      "field_16": 2,
+      "field_18": 1,
+      "texture_dimensions_top_3": [
+        {
+          "width": 256,
+          "height": 256,
+          "count": 35
+        },
+        {
+          "width": 128,
+          "height": 256,
+          "count": 28
+        },
+        {
+          "width": 256,
+          "height": 512,
+          "count": 11
+        }
+      ],
+      "pixel_format_status": "16-bpp size invariant observed; exact pixel format not confirmed"
+    },
+    "per_file_paths_included": false
+  }
 }
