@@ -1,5 +1,5 @@
 {
-  "schema_version": "1.1",
+  "schema_version": "1.2",
   "audit_mode": "read-only-aggregate; no archive member extraction",
   "source_apk": {
     "filename": "World-Life-0.1-BGM-Fun-In-Kyoto-V2.apk",
@@ -104,7 +104,16 @@
           "count": 1
         }
       ],
-      "pixel_format_status": "16-bpp size invariant observed; channel packing, alpha mode, color space, and row orientation not confirmed"
+      "pixel_format_status": "Native code confirms field_16 format code 2 maps to 2 bytes per pixel; channel packing, alpha mode, color space, and row orientation remain unconfirmed.",
+      "native_bytes_per_pixel_lookup": [
+        1,
+        1,
+        2,
+        2,
+        4
+      ],
+      "native_format_code": 2,
+      "native_bytes_per_pixel": 2
     }
   }
 }
