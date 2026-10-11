@@ -4,12 +4,14 @@
   "status": "planning-baseline",
   "project": "World Life — Dukku",
   "created_date": "2026-10-11",
+  "scope": "Original assets for a Japan-inspired town-life game; visual reference is used for broad camera/readability study only, not for copying protected geometry, art, logos, or audio.",
   "rules": {
     "master_apk_is_read_only": true,
     "original_assets_required": true,
     "planned_assets_are_not_game_ready": true,
     "license_and_provenance_required_before_import": true,
-    "no_unverified_runtime_or_compatibility_claims": true
+    "no_unverified_runtime_or_compatibility_claims": true,
+    "engine_agnostic_until_target_runtime_is_verified": true
   },
   "required_fields": [
     "id",
@@ -55,48 +57,58 @@
     {
       "id": "ENV-0001",
       "category": "environment",
-      "name": "Kyoto-inspired town environment blockout",
-      "description": "Original blockout for a compact Japanese town scene; reference broad composition and camera readability, not copied geometry.",
+      "name": "Town blockout and camera study",
+      "description": "Original small-town blockout used to verify playable footprint, depth readability, camera framing, and object scale before detailed production.",
       "status": "not-created",
       "priority": "P0",
       "source_type": "new-original-work",
       "source_path": null,
       "license": "created-for-project",
-      "target_format": "TBD after engine/import pipeline is confirmed",
+      "target_format": "TBD after original runtime format is verified",
       "export_settings": {
         "units": "TBD",
         "scale": "TBD",
-        "textures": "TBD",
+        "axis_orientation": "TBD",
+        "pivot": "TBD",
+        "texture_resolution": "TBD",
+        "compression": "TBD",
         "colliders": "TBD"
       },
       "validation": {
         "file_exists": false,
+        "provenance_review": "not-run",
+        "export_test": "not-run",
         "import_test": "not-run",
         "visual_review": "not-run",
         "runtime_test": "not-run"
       },
       "dependencies": [],
-      "notes": "Planning record only. Not a usable asset."
+      "notes": "Planning record only; no game-ready asset file exists."
     },
     {
       "id": "BLD-0001",
       "category": "building",
-      "name": "Small Japanese residential facade kit",
-      "description": "Modular original facade pieces for a low-rise residential street.",
+      "name": "Modular low-rise residence facade",
+      "description": "Original wall, roof, window, door, and corner modules for a compact residential street.",
       "status": "not-created",
       "priority": "P0",
       "source_type": "new-original-work",
       "source_path": null,
       "license": "created-for-project",
-      "target_format": "TBD after engine/import pipeline is confirmed",
+      "target_format": "TBD after original runtime format is verified",
       "export_settings": {
         "units": "TBD",
         "scale": "TBD",
-        "textures": "TBD",
+        "axis_orientation": "TBD",
+        "pivot": "TBD",
+        "texture_resolution": "TBD",
+        "compression": "TBD",
         "colliders": "TBD"
       },
       "validation": {
         "file_exists": false,
+        "provenance_review": "not-run",
+        "export_test": "not-run",
         "import_test": "not-run",
         "visual_review": "not-run",
         "runtime_test": "not-run"
@@ -104,27 +116,32 @@
       "dependencies": [
         "ENV-0001"
       ],
-      "notes": "Planning record only. Must use original geometry and materials."
+      "notes": "Planning record only; no game-ready asset file exists."
     },
     {
-      "id": "SHP-0001",
-      "category": "shop",
-      "name": "Convenience-store storefront",
-      "description": "Original storefront kit with replaceable signage and legibility tuned for the intended gameplay camera.",
+      "id": "BLD-0002",
+      "category": "building",
+      "name": "Small multi-floor building kit",
+      "description": "Original low-rise building variation with configurable facade and roof modules.",
       "status": "not-created",
       "priority": "P1",
       "source_type": "new-original-work",
       "source_path": null,
       "license": "created-for-project",
-      "target_format": "TBD after engine/import pipeline is confirmed",
+      "target_format": "TBD after original runtime format is verified",
       "export_settings": {
         "units": "TBD",
         "scale": "TBD",
-        "textures": "TBD",
+        "axis_orientation": "TBD",
+        "pivot": "TBD",
+        "texture_resolution": "TBD",
+        "compression": "TBD",
         "colliders": "TBD"
       },
       "validation": {
         "file_exists": false,
+        "provenance_review": "not-run",
+        "export_test": "not-run",
         "import_test": "not-run",
         "visual_review": "not-run",
         "runtime_test": "not-run"
@@ -133,7 +150,466 @@
         "ENV-0001",
         "BLD-0001"
       ],
-      "notes": "Planning record only. Avoid protected logos and distinctive store branding."
+      "notes": "Planning record only; no game-ready asset file exists."
+    },
+    {
+      "id": "SHP-0001",
+      "category": "shop",
+      "name": "Convenience-store storefront",
+      "description": "Original storefront with replaceable signage and readable silhouette at the verified gameplay camera.",
+      "status": "not-created",
+      "priority": "P0",
+      "source_type": "new-original-work",
+      "source_path": null,
+      "license": "created-for-project",
+      "target_format": "TBD after original runtime format is verified",
+      "export_settings": {
+        "units": "TBD",
+        "scale": "TBD",
+        "axis_orientation": "TBD",
+        "pivot": "TBD",
+        "texture_resolution": "TBD",
+        "compression": "TBD",
+        "colliders": "TBD"
+      },
+      "validation": {
+        "file_exists": false,
+        "provenance_review": "not-run",
+        "export_test": "not-run",
+        "import_test": "not-run",
+        "visual_review": "not-run",
+        "runtime_test": "not-run"
+      },
+      "dependencies": [
+        "ENV-0001",
+        "BLD-0001"
+      ],
+      "notes": "Planning record only; no game-ready asset file exists."
+    },
+    {
+      "id": "SHP-0002",
+      "category": "shop",
+      "name": "Cafe or neighborhood restaurant",
+      "description": "Original small business exterior, entrance, window treatment, and optional outdoor seating.",
+      "status": "not-created",
+      "priority": "P1",
+      "source_type": "new-original-work",
+      "source_path": null,
+      "license": "created-for-project",
+      "target_format": "TBD after original runtime format is verified",
+      "export_settings": {
+        "units": "TBD",
+        "scale": "TBD",
+        "axis_orientation": "TBD",
+        "pivot": "TBD",
+        "texture_resolution": "TBD",
+        "compression": "TBD",
+        "colliders": "TBD"
+      },
+      "validation": {
+        "file_exists": false,
+        "provenance_review": "not-run",
+        "export_test": "not-run",
+        "import_test": "not-run",
+        "visual_review": "not-run",
+        "runtime_test": "not-run"
+      },
+      "dependencies": [
+        "ENV-0001",
+        "BLD-0001"
+      ],
+      "notes": "Planning record only; no game-ready asset file exists."
+    },
+    {
+      "id": "DEC-0001",
+      "category": "decoration",
+      "name": "Vending machine prop",
+      "description": "Original standalone prop with a clear interaction-facing side and collision specification.",
+      "status": "not-created",
+      "priority": "P1",
+      "source_type": "new-original-work",
+      "source_path": null,
+      "license": "created-for-project",
+      "target_format": "TBD after original runtime format is verified",
+      "export_settings": {
+        "units": "TBD",
+        "scale": "TBD",
+        "axis_orientation": "TBD",
+        "pivot": "TBD",
+        "texture_resolution": "TBD",
+        "compression": "TBD",
+        "colliders": "TBD"
+      },
+      "validation": {
+        "file_exists": false,
+        "provenance_review": "not-run",
+        "export_test": "not-run",
+        "import_test": "not-run",
+        "visual_review": "not-run",
+        "runtime_test": "not-run"
+      },
+      "dependencies": [
+        "ENV-0001"
+      ],
+      "notes": "Planning record only; no game-ready asset file exists."
+    },
+    {
+      "id": "DEC-0002",
+      "category": "decoration",
+      "name": "Street lantern and sign set",
+      "description": "Original Japanese-town-inspired street props; avoid copying real brands or distinctive copyrighted signage.",
+      "status": "not-created",
+      "priority": "P1",
+      "source_type": "new-original-work",
+      "source_path": null,
+      "license": "created-for-project",
+      "target_format": "TBD after original runtime format is verified",
+      "export_settings": {
+        "units": "TBD",
+        "scale": "TBD",
+        "axis_orientation": "TBD",
+        "pivot": "TBD",
+        "texture_resolution": "TBD",
+        "compression": "TBD",
+        "colliders": "TBD"
+      },
+      "validation": {
+        "file_exists": false,
+        "provenance_review": "not-run",
+        "export_test": "not-run",
+        "import_test": "not-run",
+        "visual_review": "not-run",
+        "runtime_test": "not-run"
+      },
+      "dependencies": [
+        "ENV-0001"
+      ],
+      "notes": "Planning record only; no game-ready asset file exists."
+    },
+    {
+      "id": "VEG-0001",
+      "category": "vegetation",
+      "name": "Tree and canopy set",
+      "description": "Original tree silhouettes and foliage variants with a budget for transparent overdraw and draw calls.",
+      "status": "not-created",
+      "priority": "P1",
+      "source_type": "new-original-work",
+      "source_path": null,
+      "license": "created-for-project",
+      "target_format": "TBD after original runtime format is verified",
+      "export_settings": {
+        "units": "TBD",
+        "scale": "TBD",
+        "axis_orientation": "TBD",
+        "pivot": "TBD",
+        "texture_resolution": "TBD",
+        "compression": "TBD",
+        "colliders": "TBD"
+      },
+      "validation": {
+        "file_exists": false,
+        "provenance_review": "not-run",
+        "export_test": "not-run",
+        "import_test": "not-run",
+        "visual_review": "not-run",
+        "runtime_test": "not-run"
+      },
+      "dependencies": [
+        "ENV-0001"
+      ],
+      "notes": "Planning record only; no game-ready asset file exists."
+    },
+    {
+      "id": "VEG-0002",
+      "category": "vegetation",
+      "name": "Planter and low shrub set",
+      "description": "Original small vegetation props for sidewalks, entrances, and public spaces.",
+      "status": "not-created",
+      "priority": "P2",
+      "source_type": "new-original-work",
+      "source_path": null,
+      "license": "created-for-project",
+      "target_format": "TBD after original runtime format is verified",
+      "export_settings": {
+        "units": "TBD",
+        "scale": "TBD",
+        "axis_orientation": "TBD",
+        "pivot": "TBD",
+        "texture_resolution": "TBD",
+        "compression": "TBD",
+        "colliders": "TBD"
+      },
+      "validation": {
+        "file_exists": false,
+        "provenance_review": "not-run",
+        "export_test": "not-run",
+        "import_test": "not-run",
+        "visual_review": "not-run",
+        "runtime_test": "not-run"
+      },
+      "dependencies": [
+        "ENV-0001"
+      ],
+      "notes": "Planning record only; no game-ready asset file exists."
+    },
+    {
+      "id": "RD-0001",
+      "category": "roadside",
+      "name": "Road, curb, and sidewalk segments",
+      "description": "Reusable original street segments with defined snapping dimensions and edge rules.",
+      "status": "not-created",
+      "priority": "P0",
+      "source_type": "new-original-work",
+      "source_path": null,
+      "license": "created-for-project",
+      "target_format": "TBD after original runtime format is verified",
+      "export_settings": {
+        "units": "TBD",
+        "scale": "TBD",
+        "axis_orientation": "TBD",
+        "pivot": "TBD",
+        "texture_resolution": "TBD",
+        "compression": "TBD",
+        "colliders": "TBD"
+      },
+      "validation": {
+        "file_exists": false,
+        "provenance_review": "not-run",
+        "export_test": "not-run",
+        "import_test": "not-run",
+        "visual_review": "not-run",
+        "runtime_test": "not-run"
+      },
+      "dependencies": [
+        "ENV-0001"
+      ],
+      "notes": "Planning record only; no game-ready asset file exists."
+    },
+    {
+      "id": "RD-0002",
+      "category": "roadside",
+      "name": "Crosswalk and road marking set",
+      "description": "Original road markings with scale and texture tiling documented after format verification.",
+      "status": "not-created",
+      "priority": "P1",
+      "source_type": "new-original-work",
+      "source_path": null,
+      "license": "created-for-project",
+      "target_format": "TBD after original runtime format is verified",
+      "export_settings": {
+        "units": "TBD",
+        "scale": "TBD",
+        "axis_orientation": "TBD",
+        "pivot": "TBD",
+        "texture_resolution": "TBD",
+        "compression": "TBD",
+        "colliders": "TBD"
+      },
+      "validation": {
+        "file_exists": false,
+        "provenance_review": "not-run",
+        "export_test": "not-run",
+        "import_test": "not-run",
+        "visual_review": "not-run",
+        "runtime_test": "not-run"
+      },
+      "dependencies": [
+        "RD-0001"
+      ],
+      "notes": "Planning record only; no game-ready asset file exists."
+    },
+    {
+      "id": "VEH-0001",
+      "category": "vehicle",
+      "name": "Compact passenger car",
+      "description": "Original low-detail vehicle silhouette for street dressing; geometry and collision depend on camera and runtime constraints.",
+      "status": "not-created",
+      "priority": "P2",
+      "source_type": "new-original-work",
+      "source_path": null,
+      "license": "created-for-project",
+      "target_format": "TBD after original runtime format is verified",
+      "export_settings": {
+        "units": "TBD",
+        "scale": "TBD",
+        "axis_orientation": "TBD",
+        "pivot": "TBD",
+        "texture_resolution": "TBD",
+        "compression": "TBD",
+        "colliders": "TBD"
+      },
+      "validation": {
+        "file_exists": false,
+        "provenance_review": "not-run",
+        "export_test": "not-run",
+        "import_test": "not-run",
+        "visual_review": "not-run",
+        "runtime_test": "not-run"
+      },
+      "dependencies": [
+        "ENV-0001"
+      ],
+      "notes": "Planning record only; no game-ready asset file exists."
+    },
+    {
+      "id": "CHR-0001",
+      "category": "character",
+      "name": "Civilian NPC base silhouette",
+      "description": "Original character proportion and facing-direction study; animation rig remains blocked until runtime needs are known.",
+      "status": "not-created",
+      "priority": "P2",
+      "source_type": "new-original-work",
+      "source_path": null,
+      "license": "created-for-project",
+      "target_format": "TBD after original runtime format is verified",
+      "export_settings": {
+        "units": "TBD",
+        "scale": "TBD",
+        "axis_orientation": "TBD",
+        "pivot": "TBD",
+        "texture_resolution": "TBD",
+        "compression": "TBD",
+        "colliders": "TBD"
+      },
+      "validation": {
+        "file_exists": false,
+        "provenance_review": "not-run",
+        "export_test": "not-run",
+        "import_test": "not-run",
+        "visual_review": "not-run",
+        "runtime_test": "not-run"
+      },
+      "dependencies": [
+        "ENV-0001"
+      ],
+      "notes": "Planning record only; no game-ready asset file exists."
+    },
+    {
+      "id": "UI-0001",
+      "category": "ui",
+      "name": "Interface icon family",
+      "description": "Original icon set with grid, safe area, transparency, and density variants documented.",
+      "status": "not-created",
+      "priority": "P1",
+      "source_type": "new-original-work",
+      "source_path": null,
+      "license": "created-for-project",
+      "target_format": "TBD after original runtime format is verified",
+      "export_settings": {
+        "units": "TBD",
+        "scale": "TBD",
+        "axis_orientation": "TBD",
+        "pivot": "TBD",
+        "texture_resolution": "TBD",
+        "compression": "TBD",
+        "colliders": "TBD"
+      },
+      "validation": {
+        "file_exists": false,
+        "provenance_review": "not-run",
+        "export_test": "not-run",
+        "import_test": "not-run",
+        "visual_review": "not-run",
+        "runtime_test": "not-run"
+      },
+      "dependencies": [],
+      "notes": "Planning record only; no game-ready asset file exists."
+    },
+    {
+      "id": "AUD-0001",
+      "category": "audio",
+      "name": "Original town ambience loop",
+      "description": "Newly recorded or properly licensed ambience; no extraction/reuse of original APK audio.",
+      "status": "not-created",
+      "priority": "P2",
+      "source_type": "new-original-work",
+      "source_path": null,
+      "license": "created-for-project",
+      "target_format": "TBD after original runtime format is verified",
+      "export_settings": {
+        "units": "TBD",
+        "scale": "TBD",
+        "axis_orientation": "TBD",
+        "pivot": "TBD",
+        "texture_resolution": "TBD",
+        "compression": "TBD",
+        "colliders": "TBD"
+      },
+      "validation": {
+        "file_exists": false,
+        "provenance_review": "not-run",
+        "export_test": "not-run",
+        "import_test": "not-run",
+        "visual_review": "not-run",
+        "runtime_test": "not-run"
+      },
+      "dependencies": [],
+      "notes": "Planning record only; no game-ready asset file exists."
+    },
+    {
+      "id": "VFX-0001",
+      "category": "vfx",
+      "name": "Placement confirmation effect",
+      "description": "Original lightweight placement/selection feedback effect tuned to the final runtime and frame budget.",
+      "status": "not-created",
+      "priority": "P2",
+      "source_type": "new-original-work",
+      "source_path": null,
+      "license": "created-for-project",
+      "target_format": "TBD after original runtime format is verified",
+      "export_settings": {
+        "units": "TBD",
+        "scale": "TBD",
+        "axis_orientation": "TBD",
+        "pivot": "TBD",
+        "texture_resolution": "TBD",
+        "compression": "TBD",
+        "colliders": "TBD"
+      },
+      "validation": {
+        "file_exists": false,
+        "provenance_review": "not-run",
+        "export_test": "not-run",
+        "import_test": "not-run",
+        "visual_review": "not-run",
+        "runtime_test": "not-run"
+      },
+      "dependencies": [],
+      "notes": "Planning record only; no game-ready asset file exists."
+    },
+    {
+      "id": "MAP-0001",
+      "category": "map-data",
+      "name": "Map and object placement schema",
+      "description": "Documented editable schema for world coordinates, object IDs, rotation, layer, collision, and asset references; not assumed compatible with legacy SMF.",
+      "status": "not-created",
+      "priority": "P0",
+      "source_type": "new-original-work",
+      "source_path": null,
+      "license": "created-for-project",
+      "target_format": "TBD after original runtime format is verified",
+      "export_settings": {
+        "units": "TBD",
+        "scale": "TBD",
+        "axis_orientation": "TBD",
+        "pivot": "TBD",
+        "texture_resolution": "TBD",
+        "compression": "TBD",
+        "colliders": "TBD"
+      },
+      "validation": {
+        "file_exists": false,
+        "provenance_review": "not-run",
+        "export_test": "not-run",
+        "import_test": "not-run",
+        "visual_review": "not-run",
+        "runtime_test": "not-run"
+      },
+      "dependencies": [
+        "ENV-0001",
+        "RD-0001"
+      ],
+      "notes": "Planning record only; no game-ready asset file exists."
     }
   ]
 }
