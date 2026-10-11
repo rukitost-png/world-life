@@ -48,7 +48,7 @@ def _inspect_text1000(inner: bytes) -> dict | None:
 
 def inspect_nested_texture(data: bytes) -> dict | None:
     """Parse concatenated type-2 records containing nested NBC + text1000 textures."""
-    if len(data) < 20 or struct.unpack("<I", data[:4])[0] != 2:
+    if len(data) < 4 or struct.unpack("<I", data[:4])[0] != 2:
         return None
 
     offset = 0
