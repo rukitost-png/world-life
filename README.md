@@ -16,6 +16,7 @@ Repository baseline for original game assets, read-only APK format research, and
 - [Catalog JSON Schema](assets/catalog/asset-catalog.schema.json)
 - [Repository Layout](docs/REPOSITORY_LAYOUT.md)
 - [Consolidated Project Status Report](reports/PROJECT_STATUS_2026-10-11.md)
+- [Next Execution Plan — Legacy Map/Texture Compatibility](docs/NEXT_EXECUTION_PLAN_2026-10-11.md)
 
 ## Current status
 The catalog contains 17 planning entries. They are not finished or importable game assets. The read-only APK probe confirms archive integrity and a subset of container signatures, but not the complete binary formats or runtime compatibility.
