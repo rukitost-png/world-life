@@ -62,6 +62,10 @@ The master APK has not been modified or committed to this repository.
 - .github/workflows/guardrails.yml — automated test workflow
 - .gitignore — ignores APKs, signing material, secrets, and build artifacts
 
+## Follow-up hardening — 2026-10-11
+
+The parser now preserves malformed first type-2 mapdata records as structured diagnostic output, including invalid record-size and missing-inner-wrapper cases. Two synthetic regression tests were added. The previously recorded passing CI run predates these newest edits; this session could not independently confirm a new workflow run, so the new tests are pending CI confirmation.
+
 ## Test status
 
 - Local read-only APK audit: PASS; ZIP integrity passed and no wrapper decompression/declared-size errors were found.
