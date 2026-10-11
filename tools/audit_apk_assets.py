@@ -154,6 +154,7 @@ def audit(apk_path: Path) -> dict:
                     "size_bytes": info.file_size,
                     "sha256": hashlib.sha256(data).hexdigest(),
                     "decoded_type": result.get("decoded_type"),
+                    "nested_payload": result.get("nested_payload"),
                 })
             signature_counts[f"{ext}:{result['wrapper']}"] += 1
             if result.get("decoded_type"):
@@ -183,6 +184,40 @@ def audit(apk_path: Path) -> dict:
         "decoded_type_counts": dict(sorted(mapdata_type_counts.items())),
         "duplicate_container_groups": duplicate_mapdata_groups[:20],
         "per_file_paths_included": False,
+    }
+    nested_textures = [
+        item["nested_payload"] for item in mapdata_resources
+        if item.get("nested_payload") is not None
+        and item["nested_payload"].get("texture_magic") == "text1000"
+    ]
+    texture_dimensions = collections.Counter(
+        (item["texture_width"], item["texture_height"])
+        for item in nested_textures
+        if item.get("texture_width") is not None and item.get("texture_height") is not None
+    )
+    content_dimensions = collections.Counter(
+        (item["content_width"], item["content_height"])
+        for item in nested_textures
+        if item.get("content_width") is not None and item.get("content_height") is not None
+    )
+    mapdata_probe["nested_texture_probe"] = {
+        "texture_count": len(nested_textures),
+        "inner_size_match_count": sum(item.get("inner_size_matches") is True for item in nested_textures),
+        "pixel_size_matches_16bpp_count": sum(item.get("pixel_size_matches_16bpp") is True for item in nested_textures),
+        "data_offset_counts": dict(sorted(collections.Counter(
+            str(item.get("data_offset")) for item in nested_textures).items())),
+        "field_16_counts": dict(sorted(collections.Counter(
+            str(item.get("field_16")) for item in nested_textures).items())),
+        "field_18_counts": dict(sorted(collections.Counter(
+            str(item.get("field_18")) for item in nested_textures).items())),
+        "texture_dimensions_top_20": [
+            {"width": w, "height": h, "count": n}
+            for (w, h), n in texture_dimensions.most_common(20)
+        ],
+        "content_dimensions_top_20": [
+            {"width": w, "height": h, "count": n}
+            for (w, h), n in content_dimensions.most_common(20)
+        ],
     }
     return {
         "schema_version": "1.1",
