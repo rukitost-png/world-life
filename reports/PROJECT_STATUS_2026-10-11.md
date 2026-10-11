@@ -25,7 +25,7 @@ This is a **technical baseline and planning milestone, not a completed game buil
 10. **Automation** — catalog and wrapper tests are present; the latest GitHub Actions run passed.
 11. **Native loader disassembly v0.2** — focused ARM Thumb disassembly traced map-data loading through package/external resource lookup, NBC decompression, SHA-256 checksum validation, and indexed cache acceptance. The checksum comes from indexed object-display metadata; the EFILE path table and checksum update source remain unresolved.
 12. **Nested texture structure** — 235 indexed mapdata resources: 122 decode to PNG and 113 contain concatenated type-2 records, totaling 1,605 nested NBC + `text1000` textures. Native code confirms RGBA4444 uploads; all 1,605 records satisfy the 28-byte-header plus `width × height × 2` invariant. Secondary dimensions, row orientation, and color-space/gamma assumptions remain unresolved. 55 streams also contain trailing bytes beginning with a 2×2 PNG signature; their purpose is unknown. 105 PNG entries share identical 721-byte containers; no per-file payloads were committed.
-13. **Repeatable mapdata audit** — the read-only audit tool now detects nested NBC + `text1000` texture payloads and reports aggregate dimensions, size invariants, index gaps, decoded-type counts, and duplicate container fingerprints without listing individual resource paths. Regression tests cover nested texture recognition, index gaps, and duplicate grouping.
+13. **Repeatable mapdata audit** — the read-only audit tool now parses all 1,605 type-2 texture records across 113 streams and reports aggregate dimensions, RGBA4444 size invariants, index gaps, duplicate container fingerprints, and 55 trailing PNG-signature regions without listing individual resource paths. Regression tests cover multi-record streams, trailing data, index gaps, and duplicate grouping.
 
 ## Source APK baseline
 
@@ -68,11 +68,11 @@ The master APK has not been modified or committed to this repository.
 - Second-level mapdata probe: PASS for 113/113 nested wrappers; inner decoded sizes matched, and all 113 `text1000` payloads matched the 28-byte-header plus `width × height × 2` length invariant.
 - Focused static disassembly: PASS for the targeted symbol functions; this is static analysis only, not a runtime trace or device test.
 - Wrapper unit tests: PASS in local run.
-- Latest completed code regression workflow: PASS, run [38147590968](https://github.com/rukitost-png/world-life/actions/runs/38147590968), on commit `a606647cb6417e96eae4e515d0fc2bcf4a240b60`. It covers nested texture stream parsing and aggregate mapdata audit; subsequent changes were documentation/report updates.
+- Latest completed code regression workflow: PASS, run [38147726908](https://github.com/rukitost-png/world-life/actions/runs/38147726908), on commit `9a4f6e96e1fd72939a61102ba29e3393d8809511`. It covers nested texture stream parsing, multiple records, trailing PNG-signature data, and aggregate mapdata audit; subsequent changes were documentation-only.
 
 ## Explicit blockers — do not treat these as complete
 
-1. **Legacy data formats:** the 42 unclassified SMF files and the opaque decoded binary payloads still need schema analysis.
+1. **Legacy data formats:** 42 SMF files remain unclassified, and 108 non-mapdata SMF payloads still fall into the opaque-binary bucket. The 113 mapdata streams are now parsed into 1,605 RGBA4444 texture records, but their offset/index metadata is not yet fully mapped.
 2. **Runtime loader path:** focused disassembly confirms the decompression and SHA-256 checksum gate, but the full `EFILE` enum/path table and checksum-table population/update path remain unresolved.
 3. **Texture decoder semantics:** RGBA4444 is confirmed, but row orientation, color-space/gamma assumptions, secondary header fields, and the 55 trailing PNG-signature regions remain unresolved.
 4. **Camera/scale measurements:** exact projection, zoom range, world units, and object footprint need measurements from reference screenshots/device captures.
