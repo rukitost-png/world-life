@@ -1,0 +1,139 @@
+{
+  "catalog_id": "WORLD-LIFE-DUKKU-ASSET-CATALOG",
+  "version": "0.1",
+  "status": "planning-baseline",
+  "project": "World Life — Dukku",
+  "created_date": "2026-10-11",
+  "rules": {
+    "master_apk_is_read_only": true,
+    "original_assets_required": true,
+    "planned_assets_are_not_game_ready": true,
+    "license_and_provenance_required_before_import": true,
+    "no_unverified_runtime_or_compatibility_claims": true
+  },
+  "required_fields": [
+    "id",
+    "category",
+    "name",
+    "description",
+    "status",
+    "priority",
+    "source_type",
+    "source_path",
+    "license",
+    "target_format",
+    "export_settings",
+    "validation",
+    "dependencies",
+    "notes"
+  ],
+  "allowed_statuses": [
+    "planned",
+    "in-production",
+    "review",
+    "validated",
+    "integrated",
+    "blocked",
+    "rejected",
+    "not-created"
+  ],
+  "categories": [
+    "environment",
+    "building",
+    "shop",
+    "decoration",
+    "vegetation",
+    "roadside",
+    "vehicle",
+    "character",
+    "ui",
+    "audio",
+    "vfx",
+    "map-data"
+  ],
+  "assets": [
+    {
+      "id": "ENV-0001",
+      "category": "environment",
+      "name": "Kyoto-inspired town environment blockout",
+      "description": "Original blockout for a compact Japanese town scene; reference broad composition and camera readability, not copied geometry.",
+      "status": "not-created",
+      "priority": "P0",
+      "source_type": "new-original-work",
+      "source_path": null,
+      "license": "created-for-project",
+      "target_format": "TBD after engine/import pipeline is confirmed",
+      "export_settings": {
+        "units": "TBD",
+        "scale": "TBD",
+        "textures": "TBD",
+        "colliders": "TBD"
+      },
+      "validation": {
+        "file_exists": false,
+        "import_test": "not-run",
+        "visual_review": "not-run",
+        "runtime_test": "not-run"
+      },
+      "dependencies": [],
+      "notes": "Planning record only. Not a usable asset."
+    },
+    {
+      "id": "BLD-0001",
+      "category": "building",
+      "name": "Small Japanese residential facade kit",
+      "description": "Modular original facade pieces for a low-rise residential street.",
+      "status": "not-created",
+      "priority": "P0",
+      "source_type": "new-original-work",
+      "source_path": null,
+      "license": "created-for-project",
+      "target_format": "TBD after engine/import pipeline is confirmed",
+      "export_settings": {
+        "units": "TBD",
+        "scale": "TBD",
+        "textures": "TBD",
+        "colliders": "TBD"
+      },
+      "validation": {
+        "file_exists": false,
+        "import_test": "not-run",
+        "visual_review": "not-run",
+        "runtime_test": "not-run"
+      },
+      "dependencies": [
+        "ENV-0001"
+      ],
+      "notes": "Planning record only. Must use original geometry and materials."
+    },
+    {
+      "id": "SHP-0001",
+      "category": "shop",
+      "name": "Convenience-store storefront",
+      "description": "Original storefront kit with replaceable signage and legibility tuned for the intended gameplay camera.",
+      "status": "not-created",
+      "priority": "P1",
+      "source_type": "new-original-work",
+      "source_path": null,
+      "license": "created-for-project",
+      "target_format": "TBD after engine/import pipeline is confirmed",
+      "export_settings": {
+        "units": "TBD",
+        "scale": "TBD",
+        "textures": "TBD",
+        "colliders": "TBD"
+      },
+      "validation": {
+        "file_exists": false,
+        "import_test": "not-run",
+        "visual_review": "not-run",
+        "runtime_test": "not-run"
+      },
+      "dependencies": [
+        "ENV-0001",
+        "BLD-0001"
+      ],
+      "notes": "Planning record only. Avoid protected logos and distinctive store branding."
+    }
+  ]
+}
