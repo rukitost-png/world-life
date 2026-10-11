@@ -44,7 +44,7 @@ The static implementation supports the existing Python audit's wrapper interpret
 - The package path calls `GetResourcePath(EFILE)`, opens the returned path, reads the file bytes, and returns the allocated buffer and byte count.
 - The general read path has branches into both package-resource loading and an external/save-data read path, with patch-manager state involved. The exact `EFILE` enum-to-path table and every branch condition have not yet been fully reconstructed.
 
-The APK contains Android raw resources named `res/raw/mapdataNNN.smf` (235 indexed entries were counted in the read-only archive probe). The native library also contains logical filename strings such as `mapdata%02d.nbc` and checksum/texture error messages. These observations are consistent with a resource abstraction that can use different package and logical names; they do not prove the names are interchangeable in every code path.
+The APK contains Android raw resources named `res/raw/mapdataNNN.smf` (235 indexed entries for indices 000–234). A follow-up archive probe found 105 entries with a 721-byte container; all 105 have the same container SHA-256 and decode to the same 19,020-byte PNG. The remaining 130 entries are larger by file size. The native library also contains logical filename strings such as `mapdata%02d.nbc` and checksum/texture error messages. These observations are consistent with a resource abstraction that can use different package and logical names; they do not prove the names are interchangeable in every code path.
 
 ### 4. Map coordinate conversion
 
