@@ -65,7 +65,16 @@ class MapdataResourceAuditTests(unittest.TestCase):
             + b"\x00" * 8
         )
         inner_wrapper = WRAPPER_MAGIC + struct.pack("<I", len(texture)) + zlib.compress(texture)
-        nested = struct.pack("<II", 2, len(inner_wrapper)) + inner_wrapper
+        record_one = struct.pack("<II", 2, len(inner_wrapper)) + inner_wrapper
+        texture_two = (
+            b"text1000"
+            + struct.pack("<HHHHHHI", 1, 1, 1, 1, 2, 1, 28)
+            + b"\x00" * 4
+            + b"\x00" * 2
+        )
+        inner_wrapper_two = WRAPPER_MAGIC + struct.pack("<I", len(texture_two)) + zlib.compress(texture_two)
+        record_two = struct.pack("<II", 2, len(inner_wrapper_two)) + inner_wrapper_two
+        nested = record_one + record_two + png + b"tail"
         nested_wrapper = WRAPPER_MAGIC + struct.pack("<I", len(nested)) + zlib.compress(nested)
         with tempfile.TemporaryDirectory() as directory:
             apk = Path(directory) / "fixture.apk"
@@ -85,8 +94,9 @@ class MapdataResourceAuditTests(unittest.TestCase):
         self.assertEqual(probe["decoded_type_counts"]["opaque-binary"], 2)
         self.assertEqual(probe["decoded_type_counts"]["png"], 1)
         self.assertEqual(probe["decoded_type_counts"]["nested-text1000-texture-stream"], 1)
-        self.assertEqual(probe["nested_texture_probe"]["texture_record_count"], 1)
-        self.assertEqual(probe["nested_texture_probe"]["pixel_size_matches_16bpp_count"], 1)
+        self.assertEqual(probe["nested_texture_probe"]["texture_record_count"], 2)
+        self.assertEqual(probe["nested_texture_probe"]["pixel_size_matches_16bpp_count"], 2)
+        self.assertEqual(probe["nested_texture_probe"]["trailing_png_signature_stream_count"], 1)
 
 
 if __name__ == "__main__":
