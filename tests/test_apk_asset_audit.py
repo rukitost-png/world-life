@@ -32,6 +32,26 @@ class WrapperFormatTests(unittest.TestCase):
     def test_unknown_signature_is_not_misclassified(self):
         self.assertEqual(inspect_wrapper(b"not-a-known-format")["wrapper"], "other-signature")
 
+    def test_detects_nested_text1000_texture_payload(self):
+        pixels = b"\\x00" * 8
+        texture = (
+            b"text1000"
+            + struct.pack("<HHHHHHI", 2, 2, 2, 2, 2, 1, 28)
+            + b"\\x00" * 4
+            + pixels
+        )
+        inner_wrapper = WRAPPER_MAGIC + struct.pack("<I", len(texture)) + zlib.compress(texture)
+        nested = struct.pack("<II", 2, 1) + inner_wrapper
+        outer_wrapper = WRAPPER_MAGIC + struct.pack("<I", len(nested)) + zlib.compress(nested)
+
+        result = inspect_wrapper(outer_wrapper)
+        self.assertEqual(result["decoded_type"], "nested-text1000-texture")
+        self.assertTrue(result["nested_payload"]["inner_size_matches"])
+        self.assertEqual(result["nested_payload"]["texture_width"], 2)
+        self.assertEqual(result["nested_payload"]["texture_height"], 2)
+        self.assertEqual(result["nested_payload"]["pixel_payload_bytes"], 8)
+        self.assertTrue(result["nested_payload"]["pixel_size_matches_16bpp"])
+
 
 class MapdataResourceAuditTests(unittest.TestCase):
     def test_aggregates_index_range_and_duplicate_fingerprints_without_paths(self):
