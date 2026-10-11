@@ -1,0 +1,162 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/rukitost-png/world-life/blob/main/assets/catalog/asset-catalog.schema.json",
+  "title": "World Life Dukku Asset Catalog",
+  "type": "object",
+  "required": [
+    "catalog_id",
+    "version",
+    "status",
+    "project",
+    "required_fields",
+    "allowed_statuses",
+    "categories",
+    "assets"
+  ],
+  "properties": {
+    "catalog_id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "version": {
+      "type": "string",
+      "pattern": "^\\d+\\.\\d+$"
+    },
+    "status": {
+      "type": "string",
+      "minLength": 1
+    },
+    "project": {
+      "type": "string",
+      "minLength": 1
+    },
+    "created_date": {
+      "type": "string",
+      "format": "date"
+    },
+    "scope": {
+      "type": "string"
+    },
+    "rules": {
+      "type": "object"
+    },
+    "required_fields": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "minItems": 1,
+      "uniqueItems": true
+    },
+    "allowed_statuses": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "minItems": 1,
+      "uniqueItems": true
+    },
+    "categories": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "minItems": 1,
+      "uniqueItems": true
+    },
+    "assets": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": [
+          "id",
+          "category",
+          "name",
+          "description",
+          "status",
+          "priority",
+          "source_type",
+          "source_path",
+          "license",
+          "target_format",
+          "export_settings",
+          "validation",
+          "dependencies",
+          "notes"
+        ],
+        "properties": {
+          "id": {
+            "type": "string",
+            "pattern": "^[A-Z]{2,4}-\\d{4}$"
+          },
+          "category": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string",
+            "minLength": 1
+          },
+          "description": {
+            "type": "string",
+            "minLength": 1
+          },
+          "status": {
+            "enum": [
+              "planned",
+              "in-production",
+              "review",
+              "validated",
+              "integrated",
+              "blocked",
+              "rejected",
+              "not-created"
+            ]
+          },
+          "priority": {
+            "enum": [
+              "P0",
+              "P1",
+              "P2",
+              "P3"
+            ]
+          },
+          "source_type": {
+            "type": "string"
+          },
+          "source_path": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "license": {
+            "type": "string",
+            "minLength": 1
+          },
+          "target_format": {
+            "type": "string",
+            "minLength": 1
+          },
+          "export_settings": {
+            "type": "object"
+          },
+          "validation": {
+            "type": "object"
+          },
+          "dependencies": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "uniqueItems": true
+          },
+          "notes": {
+            "type": "string"
+          }
+        },
+        "additionalProperties": false
+      }
+    }
+  },
+  "additionalProperties": false
+}
