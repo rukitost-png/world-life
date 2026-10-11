@@ -1,0 +1,27 @@
+# Never commit the reference/master APK or generated Android packages
+*.apk
+*.aab
+*.ap_
+*.dex
+
+# Signing material and credentials
+*.keystore
+*.jks
+*.p12
+*.pem
+*.key
+.env
+.env.*
+secrets/
+credentials/
+
+# Local build/test artifacts
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.coverage
+build/
+dist/
+.gradle/
+.idea/
+.vscode/
