@@ -32,6 +32,12 @@ class WrapperFormatTests(unittest.TestCase):
     def test_unknown_signature_is_not_misclassified(self):
         self.assertEqual(inspect_wrapper(b"not-a-known-format")["wrapper"], "other-signature")
 
+    def test_reports_truncated_type2_record_header(self):
+        wrapped = WRAPPER_MAGIC + struct.pack("<I", 4) + zlib.compress(struct.pack("<I", 2))
+        result = inspect_wrapper(wrapped)
+        self.assertEqual(result["decoded_type"], "nested-nbc-unverified")
+        self.assertEqual(result["nested_payload"]["record_error"], "truncated-record-header")
+
     def test_reports_malformed_first_type2_record_size(self):
         malformed = struct.pack("<II", 2, 0) + bytes(12)
         wrapped = WRAPPER_MAGIC + struct.pack("<I", len(malformed)) + zlib.compress(malformed)
