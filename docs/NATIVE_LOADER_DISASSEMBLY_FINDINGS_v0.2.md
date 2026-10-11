@@ -30,6 +30,10 @@ The loader path is now clearer than symbol/string triage alone. The native objec
 
 - `CNBCompressFile::CheckHeader(void*, unsigned int)`: `0x00132cf0`
 - `CNBCompressFile::UncompressAllocate(...)`: `0x00133100`
+- `CNblTexture::LoadTextureFromCompressedRaw(...)`: `0x00136910`
+- `CNblTexture::LoadTexture(...)`: `0x00136748`
+- `CNblTexture::Initialize(...)`: `0x00136780`
+- `CNblTexture::GetBytesPerPixel()`: `0x00136690`
 - `CheckHeader` rejects inputs of 12 bytes or fewer and checks the first two 32-bit words against the `nbc 0100` magic/version bytes.
 - `UncompressAllocate` reads the 32-bit decoded-size field at byte offset 8, allocates that many bytes, and passes the payload beginning at byte offset 12 to the native inflate helper.
 - This independently confirms the observed 12-byte wrapper layout: 8-byte magic/version text, a 4-byte size field, then compressed data.
@@ -65,7 +69,7 @@ The 113 `text1000` payloads share the following observed layout:
 | 24–27 | Reserved-looking bytes | Four zero bytes in all 113 samples |
 | 28 onward | Pixel-like payload | Exactly `first dimension × second dimension × 2` bytes in all 113 samples |
 
-The exact size invariant is strong evidence for a raw 16-bit-per-pixel texture payload. It does **not** identify the channel packing, alpha mode, color space, row orientation, or the meaning of the secondary dimensions and fields A/B. Those semantics require tracing the native texture reader (including the `text1000` consumer) and should not be guessed when writing production assets.
+The native consumer is now traced one level deeper: `CNblTexture::LoadTextureFromCompressedRaw` calls `UncompressAllocate` on the nested wrapper and then dispatches to `CNblTexture::LoadTexture`; its initializer reads the `text1000` header and copies pixel bytes from offset 28. `CNblTexture::GetBytesPerPixel` indexes a native lookup table `[1, 1, 2, 2, 4]` using the 16-bit field at header offset 16. That field is `2` in all 113 mapdata samples, so the native code confirms 2 bytes per pixel and explains the exact `width × height × 2` invariant. This confirms the byte width, **not** the channel packing, alpha mode, color space, row orientation, or the semantic meaning of the secondary dimensions. Those still require more decoder analysis.
 
 ### 5. Package resources and external/patch resources
 
