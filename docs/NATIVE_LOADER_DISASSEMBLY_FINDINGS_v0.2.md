@@ -47,29 +47,34 @@ The static implementation supports the existing Python audit's wrapper interpret
 - `CObjectDataManager::Initialize()` at `0x0021ea50` invokes `CBin2CSV::Initialize(EFILE)` repeatedly and consumes typed fields (`GetUINT`, `GetUSHORT`, `GetINT`, `SkipString`) while constructing object-display metadata. The binary contains the log string `[InitializeDisplayData] Invalid number of hash checksums(%d)` and the resource-name string `maptexinfo.dat`.
 - This strongly indicates that checksum expectations are part of initialized object-display metadata, but the exact `EFILE` value/source table that supplies the relevant checksum records is not yet mapped. Do not assume `maptexinfo.dat` is the sole or confirmed source without resolving the enum/path mapping.
 
-### 4. Second-level mapdata texture payload
+### 4. Second-level mapdata texture records
 
-A second, in-memory probe of all 235 `res/raw/mapdataNNN.smf` resources found two broad outer-decoded groups:
+A second, in-memory probe of all 235 res/raw/mapdataNNN.smf resources found two groups after the outer NBC wrapper is decompressed:
 
-- 122 decode directly to PNG data. A group of 105 entries share identical 721-byte containers and identical decoded PNG bytes; this byte identity alone does not establish that the entries are unused.
-- 113 decode to an 8-byte prefix followed by a second `nbc 0100` wrapper. All 113 inner wrappers decompress to a payload beginning with ASCII `text1000`.
+- 122 resources decode directly to PNG data. Of these, 105 entries share identical 721-byte containers and identical decoded PNG bytes; byte identity does not prove the entries are unused.
+- 113 resources decode to a concatenated record stream containing **1,605 type-2 texture records**. Each record begins with a 32-bit type (2), a 32-bit record size, then a nested NBC wrapper whose total length matches that size. Most streams contain multiple records; the maximum observed is 20 records in one resource.
+- 55 of the 113 record streams have additional trailing bytes beginning with a PNG signature after the parsed type-2 records. The PNG header reports 2×2, but substantial bytes follow the PNG IEND chunk; the purpose/schema of this trailing region remains unresolved.
 
-The 113 `text1000` payloads share the following observed layout:
+Each of the 1,605 nested texture records decompresses to a payload beginning with ASCII text1000, with this observed 28-byte header:
 
 | Offset | Observed field | Finding |
 |---:|---|---|
-| 0–7 | Magic | ASCII `text1000` |
-| 8–9 | First dimension | 16-bit little-endian value |
-| 10–11 | Second dimension | 16-bit little-endian value |
-| 12–13 | Secondary dimension A | 16-bit little-endian value; meaning not confirmed |
-| 14–15 | Secondary dimension B | 16-bit little-endian value; meaning not confirmed |
-| 16–17 | Pixel format code | `2` in all 113 samples; native bytes-per-pixel lookup maps code `2` to 2 bytes/pixel |
-| 18–19 | Field B | `1` in all 113 samples; meaning not confirmed |
-| 20–23 | Payload offset | `28` in all 113 samples |
-| 24–27 | Reserved-looking bytes | Four zero bytes in all 113 samples |
-| 28 onward | Pixel-like payload | Exactly `first dimension × second dimension × 2` bytes in all 113 samples |
+| 0–7 | Magic | ASCII text1000 |
+| 8–9 | Texture width | 16-bit little-endian value |
+| 10–11 | Texture height | 16-bit little-endian value |
+| 12–13 | Secondary dimension A | 16-bit little-endian value; likely a content/rectangle dimension, semantics not confirmed |
+| 14–15 | Secondary dimension B | 16-bit little-endian value; likely a content/rectangle dimension, semantics not confirmed |
+| 16–17 | Pixel format code | 2 in all 1,605 records |
+| 18–19 | Field B | 1 in all 1,605 records; meaning not confirmed |
+| 20–23 | Pixel-data offset | 28 in all 1,605 records |
+| 24–27 | Reserved-looking bytes | Four zero bytes in all 1,605 records |
+| 28 onward | Pixel data | Exactly width × height × 2 bytes in all 1,605 records |
 
-The native consumer is now traced one level deeper: `CNblTexture::LoadTextureFromCompressedRaw` calls `UncompressAllocate` on the nested wrapper and then dispatches to `CNblTexture::LoadTexture`; its initializer reads the `text1000` header and copies pixel bytes from offset 28. `CNblTexture::GetBytesPerPixel` indexes a native lookup table `[1, 1, 2, 2, 4]` using the 16-bit field at header offset 16. That field is `2` in all 113 mapdata samples, so the native code confirms 2 bytes per pixel and explains the exact `width × height × 2` invariant. This confirms the byte width, **not** the channel packing, alpha mode, color space, row orientation, or the semantic meaning of the secondary dimensions. Those still require more decoder analysis.
+The native texture reader confirms the pixel format: CNblTexture::GetBytesPerPixel uses a lookup table [1, 1, 2, 2, 4], so code 2 means 2 bytes per pixel. More decisively, CNblTexture::Initialize calls glTexImage2D with GL_RGBA (0x1908) and GL_UNSIGNED_SHORT_4_4_4_4 (0x8033). Therefore this path uses **RGBA4444 (4 bits per R, G, B, and A channel)**, not an unknown generic 16-bpp format.
+
+CObjTexManager::GetTexture branches on record type and, for type 2, calls CNblTexture::LoadTextureFromCompressedRaw with the nested NBC wrapper and the record-size field. The outer LoadMapData checksum, however, is calculated over the entire first-decompressed record stream and compared against index-specific object-display metadata. Replacing pixels alone is insufficient if the expected checksum/metadata is not updated through a compatible path.
+
+Still unresolved: the meaning of secondary dimensions and field B, row orientation, color-space/gamma assumptions, the trailing PNG-signature regions, and the resource-index/checksum update path. The audit tool now parses all type-2 records and aggregates dimensions without publishing individual payload paths.
 
 ### 5. Package resources and external/patch resources
 
