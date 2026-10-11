@@ -37,7 +37,7 @@ class WrapperFormatTests(unittest.TestCase):
         texture = (
             b"text1000"
             + struct.pack("<HHHHHHI", 2, 2, 2, 2, 2, 1, 28)
-            + b"\\x00" * 4
+            + b"\x00" * 4
             + pixels
         )
         inner_wrapper = WRAPPER_MAGIC + struct.pack("<I", len(texture)) + zlib.compress(texture)
