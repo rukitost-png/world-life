@@ -12,6 +12,8 @@ Repository baseline for original game assets, read-only APK format research, and
 - [QA and Release Checklist](docs/QA_RELEASE_CHECKLIST.md)
 - [Build Toolchain and Blockers](docs/BUILD_TOOLCHAIN_AND_BLOCKERS.md)
 - [Native Runtime Symbol Triage](docs/NATIVE_RUNTIME_SYMBOL_TRIAGE.md)
+- [Native Loader EFILE Filename Map v0.4](docs/NATIVE_LOADER_EFILE_FILENAME_MAP_v0.4.md)
+- [Native Loader Checksum Trace v0.3](docs/NATIVE_LOADER_CHECKSUM_TRACE_v0.3.md) — earlier record with a superseding mapping note
 - [Camera and Scale Study](docs/CAMERA_AND_SCALE_STUDY.md)
 - [Asset Brief Template](docs/ASSET_BRIEF_TEMPLATE.md)
 - [Catalog JSON Schema](assets/catalog/asset-catalog.schema.json)
