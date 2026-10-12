@@ -18,9 +18,10 @@ Repository baseline for original game assets, read-only APK format research, and
 - [Repository Layout](docs/REPOSITORY_LAYOUT.md)
 - [Consolidated Project Status Report](reports/PROJECT_STATUS_2026-10-11.md)
 - [Next Execution Plan — Legacy Map/Texture Compatibility](docs/NEXT_EXECUTION_PLAN_2026-10-11.md)
+- [Server Alpha v1.3 Implementation Status](reports/SERVER_ALPHA_V1.3_IMPLEMENTATION_STATUS.md)
 
 ## Current status
-The catalog contains 17 planning entries. They are not finished or importable game assets. The master APK has now been re-verified from the Library and the nested text1000 payloads are confirmed as RGBA4444 textures, not established tile grids. Import compatibility and Android runtime readiness remain unproven.
+The asset catalog remains a planning catalog, not a finished asset pack. The master APK has been re-verified read-only and nested text1000 payloads are confirmed as RGBA4444 textures, not established tile grids. Server Alpha v1.3 adds an owner console, applicant review, shop catalog CRUD, server-side purchase checks, and local integration tests; see the implementation status report. The legacy game client is not yet compatible with the new server, and no modified APK has been built or tested.
 
 ## Project boundaries
 - Keep the master APK unchanged and treat it as a read-only reference.
@@ -42,4 +43,4 @@ GitHub Actions runs the test suite on pushes, pull requests, and manual dispatch
 - Recovered and reverified the exact master APK from ChatGPT Library; SHA-256 and ZIP integrity match the immutable baseline.
 - Native texture-upload evidence plus visual previews corrects the previous grid/cell hypothesis: 1,605 nested text1000 records are RGBA4444 textures across 113 resources.
 - See [Nested Texture Findings v0.3](docs/MAPDATA_TEXTURE_FINDINGS_v0.3.md) for dimensions, header observations, statistics, and unresolved import gates.
-- Server Alpha v1.2 has a corrected probe, per-record CSV, preview sheet, and passing local unit/smoke checks. No new Dukku asset has been runtime-integrated; no modified APK has been built.
+- Server Alpha v1.3 extends the backend prototype with an owner console and server-side shop prototype. Its local SQLite integration and 16-test suite pass, but PostgreSQL concurrency, production deployment, legacy protocol compatibility, and APK rebuild/runtime testing remain open release gates.
