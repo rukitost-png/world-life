@@ -52,7 +52,7 @@ class TextureProbeTests(unittest.TestCase):
         self.assertEqual(probe.parse_stream(b"abc")["record_error"], "truncated_record_header")
 
     def test_rejects_missing_inner_wrapper(self):
-        raw = b"not an nbc!"
+        raw = b"not an nbc!!"
         parsed = probe.parse_stream(struct.pack("<II", 2, len(raw)) + raw)
         self.assertEqual(parsed["record_error"], "missing_inner_nbc_header")
 
