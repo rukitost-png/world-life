@@ -19,7 +19,7 @@ Repository baseline for original game assets, read-only APK format research, and
 - [Asset Brief Template](docs/ASSET_BRIEF_TEMPLATE.md)
 - [Catalog JSON Schema](assets/catalog/asset-catalog.schema.json)
 - [Repository Layout](docs/REPOSITORY_LAYOUT.md)
-- [Consolidated Project Status Report](reports/PROJECT_STATUS_2026-10-11.md)
+- [Consolidated Project Status Report](reports/PROJECT_STATUS_2026-10-11.md)\n- [Consolidated Project Status Report — 2026-10-13](reports/PROJECT_STATUS_2026-10-13.md)
 - [Next Execution Plan — Legacy Map/Texture Compatibility](docs/NEXT_EXECUTION_PLAN_2026-10-11.md)
 - [Server Alpha v1.3 Implementation Status](reports/SERVER_ALPHA_V1.3_IMPLEMENTATION_STATUS.md)
 
