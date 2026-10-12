@@ -56,7 +56,7 @@ class WrapperFormatTests(unittest.TestCase):
     def test_does_not_certify_stream_with_later_malformed_record(self):
         texture = (
             b"text1000"
-            + struct.pack("<HHHHHHI", 2, 2, 2, 2, 2, 1, 28)
+            + struct.pack("<HHHHHH", 2, 2, 2, 2, 2, 1) + struct.pack("<I", 28)
             + bytes(4)
             + bytes(8)
         )
@@ -75,7 +75,7 @@ class WrapperFormatTests(unittest.TestCase):
         pixels = b"\x00" * 8
         texture = (
             b"text1000"
-            + struct.pack("<HHHHHHI", 2, 2, 2, 2, 2, 1, 28)
+            + struct.pack("<HHHHHH", 2, 2, 2, 2, 2, 1) + struct.pack("<I", 28)
             + b"\x00" * 4
             + pixels
         )
@@ -99,7 +99,7 @@ class MapdataResourceAuditTests(unittest.TestCase):
         png = PNG_SIG + b"\x00" * 8 + struct.pack(">II", 8, 8)
         texture = (
             b"text1000"
-            + struct.pack("<HHHHHHI", 2, 2, 2, 2, 2, 1, 28)
+            + struct.pack("<HHHHHH", 2, 2, 2, 2, 2, 1) + struct.pack("<I", 28)
             + b"\x00" * 4
             + b"\x00" * 8
         )
@@ -107,7 +107,7 @@ class MapdataResourceAuditTests(unittest.TestCase):
         record_one = struct.pack("<II", 2, len(inner_wrapper)) + inner_wrapper
         texture_two = (
             b"text1000"
-            + struct.pack("<HHHHHHI", 1, 1, 1, 1, 2, 1, 28)
+            + struct.pack("<HHHHHH", 1, 1, 1, 1, 2, 1) + struct.pack("<I", 28)
             + b"\x00" * 4
             + b"\x00" * 2
         )
