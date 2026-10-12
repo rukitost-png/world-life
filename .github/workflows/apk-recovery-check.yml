@@ -1,0 +1,53 @@
+name: APK recovery evidence check
+
+on:
+  workflow_dispatch:
+    inputs:
+      master_sha256:
+        description: "Expected SHA-256 of the untouched master APK"
+        required: true
+        type: string
+      artifact_url:
+        description: "Optional HTTPS URL to a test APK artifact; do not use a public URL for private/unreleased builds"
+        required: false
+        type: string
+  push:
+    paths:
+      - "reports/APK_RECOVERY_EXECUTION_STATUS_2026-10-12.md"
+      - ".github/workflows/apk-recovery-check.yml"
+
+permissions:
+  contents: read
+
+jobs:
+  validate-evidence:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Check recovery status report exists
+        run: test -s reports/APK_RECOVERY_EXECUTION_STATUS_2026-10-12.md
+      - name: Validate expected master checksum format
+        if: ${{ github.event_name == 'workflow_dispatch' }}
+        env:
+          EXPECTED_SHA: ${{ inputs.master_sha256 }}
+        run: |
+          printf '%s' "$EXPECTED_SHA" | grep -Eq '^[a-fA-F0-9]{64}$'
+      - name: Explicitly reject unverified or missing APK
+        run: |
+          echo "This workflow validates recovery evidence only."
+          echo "It does not build, patch, sign, install, or certify an APK."
+          echo "A playable APK requires the original APK input, a validated patch, Android build/sign tools, and device testing."
+      - name: Optional downloaded APK integrity check
+        if: ${{ github.event_name == 'workflow_dispatch' && inputs.artifact_url != '' }}
+        env:
+          APK_URL: ${{ inputs.artifact_url }}
+        run: |
+          case "$APK_URL" in https://*) ;; *) echo "Only HTTPS URLs are accepted"; exit 1;; esac
+          curl --fail --location --silent --show-error "$APK_URL" -o candidate.apk
+          file candidate.apk
+          unzip -t candidate.apk
+          if ! unzip -l candidate.apk | grep -q 'AndroidManifest.xml'; then
+            echo "Downloaded file does not appear to be an Android APK"
+            exit 1
+          fi
+          sha256sum candidate.apk
