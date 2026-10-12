@@ -13,7 +13,7 @@ Repository baseline for original game assets, read-only APK format research, and
 - [Build Toolchain and Blockers](docs/BUILD_TOOLCHAIN_AND_BLOCKERS.md)
 - [Native Runtime Symbol Triage](docs/NATIVE_RUNTIME_SYMBOL_TRIAGE.md)
 - [Native Loader EFILE Filename Map v0.4](docs/NATIVE_LOADER_EFILE_FILENAME_MAP_v0.4.md)
-- [Native Loader EFILE Resource Audit v0.5](docs/NATIVE_LOADER_EFILE_RESOURCE_AUDIT_v0.5.md)
+- [Native Loader EFILE Resource Audit v0.5](docs/NATIVE_LOADER_EFILE_RESOURCE_AUDIT_v0.5.md) — basename-only preliminary audit, superseded by v0.6\n- [Native Loader EFILE Resource Map v0.6](docs/NATIVE_LOADER_EFILE_RESOURCE_MAP_v0.6.md)
 - [Native Loader Checksum Trace v0.3](docs/NATIVE_LOADER_CHECKSUM_TRACE_v0.3.md) — earlier record with a superseding mapping note
 - [Camera and Scale Study](docs/CAMERA_AND_SCALE_STUDY.md)
 - [Asset Brief Template](docs/ASSET_BRIEF_TEMPLATE.md)
@@ -35,7 +35,7 @@ The asset catalog remains a planning catalog, not a finished asset pack. The mas
 
 ## Tools
 - `tools/audit_apk_assets.py` generates aggregate APK metadata and probes known signatures without extracting archive members.
-- `tools/audit_efile_resources.py` cross-references native EFILE logical names with conservative APK resource-name candidates. Candidate matches are not proof of runtime resource mapping.
+- `tools/audit_efile_resources.py` cross-references native EFILE logical names with conservative APK resource-name candidates.\n- `tools/audit_efile_dex_mapping.py` joins native EFILE indices to the DEX `R.raw` IDs and exact APK resource entries for the master build.
 - Run automated checks with: `python -m unittest discover -s tests -v`.
 
 ## Automated checks
