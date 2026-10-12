@@ -103,3 +103,14 @@ The GitHub API reported this repository as public during the audit. No master AP
 ## Definition of done
 
 A catalog item is not done until an actual original asset exists, rights/provenance are documented, export settings are reproducible, automated checks pass, import succeeds, and runtime QA evidence is attached. An APK is not done until a reproducible build, signature verification, install test, and regression test are recorded.
+
+
+## Corrected texture interpretation and Library recovery — 2026-10-12
+
+The user correctly noted that World-Life-0.1-BGM-Fun-In-Kyoto-V2.apk is in ChatGPT Library. It was found at /World-Life-0.1-BGM-Fun-In-Kyoto-V2.apk, materialized read-only, and verified at 56,840,959 bytes with SHA-256 36727d1a1ac1b5f1e997efe8c312f1de7945bd6d13c91651a2b195e588185ca1; unzip -t passed. The previous inability to access the file was a retrieval failure, not a missing user artifact.
+
+A fresh local run of Server Alpha analysis tools passed: master audit, asset audit, native binary audit, DEX method/string trace, and corrected texture probe. The corrected probe parsed 1,605 nested type-2 text1000 texture records across 113 resources; all 1,605 passed the inner declared-size and 28 + width × height × 2 checks. Native glTexImage2D(GL_RGBA, GL_UNSIGNED_SHORT_4_4_4_4) evidence establishes RGBA4444 texture data. The earlier grid/cell interpretation is superseded; its zero-cell statistics must not be used as map-schema evidence.
+
+Server Alpha v1.2 now includes tools/texture_payload_probe.py, six new regression tests, per-record/per-resource CSVs, JSON/Markdown summary, 113 first-record PNG previews, and a contact sheet. Validation: python -m compileall -q auth tests tools PASS; python tests/smoke_check.py PASS; python -m pytest -q PASS (16 tests); ZIP integrity of the v1.2 source bundle PASS. Bundle and contact sheet are saved in Library.
+
+The project is still NOT a playable/release-ready game. No new Dukku asset has been proven in runtime, camera projection is not calibrated from controlled gameplay screenshots, the EFILE/index/checksum update path is unresolved, and Android SDK/build tools, device/emulator, and matching private signing key are unavailable. No APK was patched or built. The cancelled Godot prototype remains out of scope.
