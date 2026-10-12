@@ -18,10 +18,15 @@ Do not create or revive a Godot prototype. Keep the project engine-agnostic whil
 
 ## What remains blocked
 - Full format specification for unknown SMF files and decoded binary payloads.
-- Native loader/call-path analysis with suitable ELF/disassembly tools.
+- Exact EFILE/resource path and checksum-table update semantics; focused loader analysis and texture upload format are now documented.
 - Proven export/import round-trip for new assets.
-- Actual production asset files and visual review at the verified gameplay camera.
+- Original production asset files, camera measurements from controlled gameplay screenshots, and visual review at the verified gameplay camera.
 - Android rebuild, signing, installation, and device/runtime testing.
 
 ## Exit criteria
 An asset is ready only after it has original editable source, documented provenance/license, reproducible export settings, successful format validation, import evidence, and runtime QA. An APK is ready only after a reproducible build, signature verification, installation test, and feature regression tests.
+
+
+## Corrected nested texture finding (2026-10-12)
+
+The exact master APK was retrieved from the user's Library, hash-verified, and ZIP-tested. Native upload uses GL_RGBA + GL_UNSIGNED_SHORT_4_4_4_4; the 1,605 nested text1000 records are RGBA4444 textures, not established tile grids. A repeatable texture probe and preview report are included in Server Alpha v1.2. This is static-format progress only: checksum-table updates, EFILE mapping, secondary header fields, row orientation, trailing PNG-signature data, camera calibration, import round-trip, Android build/signing, and device testing remain open.
