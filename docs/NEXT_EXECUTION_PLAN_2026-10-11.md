@@ -26,6 +26,7 @@ Convert the current static-analysis findings into a controlled, falsifiable inve
 - Short type-2 payloads are now retained for diagnostics instead of being ignored solely because they are shorter than 20 bytes.
 - GitHub Actions run [38186726149](https://github.com/rukitost-png/world-life/actions/runs/38186726149) passed on commit `70acb414ff61a1ae40d1536f6c4d58c5d7c5a9a2` (2026-10-12 UTC). The catalog guardrails and full Python unittest discovery step completed successfully.
 - The successful run exposed why fixture review matters: the synthetic `text1000` fixtures packed the six 16-bit fields and the 32-bit data offset as one combined structure, shifting the offset bytes. The fixtures now encode six 16-bit fields, the 32-bit offset `28`, four reserved bytes, and pixel data in the observed 28-byte layout. This corrects tests, not the interpretation of the original APK.
+- Added an additional negative regression test for a nested texture whose inner NBC declared decoded size is off by one. GitHub Actions run [38186785833](https://github.com/rukitost-png/world-life/actions/runs/38186785833) passed on commit `c47a438c0b8b54134776f98a8e495877ba071b5f`.
 - WP4 remains partial: synthetic malformed-record diagnostics are improved, but a complete synthetic round-trip fixture and validation against the original runtime are not done.
 
 ## Work packages
