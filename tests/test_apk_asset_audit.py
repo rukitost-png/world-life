@@ -71,6 +71,23 @@ class WrapperFormatTests(unittest.TestCase):
         self.assertEqual(result["nested_payload"]["texture_count"], 1)
         self.assertEqual(result["nested_payload"]["record_error"], "invalid-record-size")
 
+    def test_rejects_nested_texture_when_inner_declared_size_mismatches(self):
+        texture = (
+            b"text1000"
+            + struct.pack("<HHHHHH", 2, 2, 2, 2, 2, 1)
+            + struct.pack("<I", 28)
+            + bytes(4)
+            + bytes(8)
+        )
+        inner_wrapper = WRAPPER_MAGIC + struct.pack("<I", len(texture) + 1) + zlib.compress(texture)
+        nested = struct.pack("<II", 2, len(inner_wrapper)) + inner_wrapper
+        outer_wrapper = WRAPPER_MAGIC + struct.pack("<I", len(nested)) + zlib.compress(nested)
+
+        result = inspect_wrapper(outer_wrapper)
+        self.assertEqual(result["decoded_type"], "nested-nbc-unverified")
+        self.assertEqual(result["nested_payload"]["texture_count"], 1)
+        self.assertFalse(result["nested_payload"]["inner_size_matches"])
+
     def test_detects_nested_text1000_texture_payload(self):
         pixels = b"\x00" * 8
         texture = (
