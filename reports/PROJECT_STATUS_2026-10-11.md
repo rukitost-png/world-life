@@ -1,6 +1,6 @@
 # World Life — Dukku Project Status Report
 
-**Report date:** 2026-10-11  
+**Report date:** 2026-10-12  
 **Repository:** rukitost-png/world-life  
 **Branch:** main  
 **Scope:** Asset Catalog v0.1, APK asset-format audit, native symbol triage, asset pipeline and release gates.
@@ -64,7 +64,7 @@ The master APK has not been modified or committed to this repository.
 
 ## Follow-up hardening — 2026-10-11
 
-The parser now preserves malformed first type-2 mapdata records as structured diagnostic output, including invalid record-size and missing-inner-wrapper cases. Regression cases now cover invalid record size, missing inner NBC header, a truncated type-2 record header, and a valid record followed by a malformed record. During review, a classification gap was found and fixed: partially parsed streams can no longer be labeled verified merely because the records parsed before the error satisfy the size invariants. Short type-2 payloads are retained for diagnostics rather than ignored by the initial length guard. The previously recorded passing CI run predates these newest edits; this session could not independently confirm a new workflow run, so the new tests are pending CI confirmation.
+The parser now preserves malformed first type-2 mapdata records as structured diagnostic output, including invalid record-size and missing-inner-wrapper cases. Regression cases now cover invalid record size, missing inner NBC header, a truncated type-2 record header, and a valid record followed by a malformed record. During review, a classification gap was found and fixed: partially parsed streams can no longer be labeled verified merely because the records parsed before the error satisfy the size invariants. Short type-2 payloads are retained for diagnostics rather than ignored by the initial length guard. GitHub Actions run [38186726149](https://github.com/rukitost-png/world-life/actions/runs/38186726149) passed on commit `70acb414ff61a1ae40d1536f6c4d58c5d7c5a9a2` on 2026-10-12 UTC. Review of the synthetic fixtures found and corrected an offset-field packing error: the six 16-bit fields, 32-bit data offset, reserved bytes, and pixel payload now match the observed 28-byte header layout. This is fixture correction only; original-runtime compatibility remains unproven.
 
 ## Test status
 
@@ -72,7 +72,7 @@ The parser now preserves malformed first type-2 mapdata records as structured di
 - Second-level mapdata probe: PASS for 113/113 nested wrappers; inner decoded sizes matched, and all 113 `text1000` payloads matched the 28-byte-header plus `width × height × 2` length invariant.
 - Focused static disassembly: PASS for the targeted symbol functions; this is static analysis only, not a runtime trace or device test.
 - Wrapper unit tests: PASS in local run.
-- Latest completed code regression workflow: PASS, run [38147726908](https://github.com/rukitost-png/world-life/actions/runs/38147726908), on commit `9a4f6e96e1fd72939a61102ba29e3393d8809511`. It covers nested texture stream parsing, multiple records, trailing PNG-signature data, and aggregate mapdata audit; subsequent changes were documentation-only.
+- Latest completed code regression workflow: PASS, run [38186726149](https://github.com/rukitost-png/world-life/actions/runs/38186726149), on commit `70acb414ff61a1ae40d1536f6c4d58c5d7c5a9a2`. The `validate` job and `python -m unittest discover -s tests -v` step completed successfully, covering catalog guardrails, nested texture stream parsing, multiple records, malformed/truncated records, trailing PNG-signature data, and aggregate mapdata audit.
 
 ## Explicit blockers — do not treat these as complete
 
