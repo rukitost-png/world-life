@@ -1,5 +1,7 @@
 # Native Loader Findings v0.3 — Checksum Table Trace
 
+> **Superseded mapping note (2026-10-12):** Follow-up analysis in [Native Loader Findings v0.4 — EFILE Filename Table](NATIVE_LOADER_EFILE_FILENAME_MAP_v0.4.md) directly resolves EFILE 0 as `maptexinfo.dat` and EFILE 434 as `airporttexinfo.dat`. The earlier table below correctly records the observed call arguments and record stride, but its generic “Object-display metadata” label should not be interpreted as proof that EFILE 434 is a map-object metadata file. The exact role of the 44-byte-stride records remains under investigation.
+
 Date: 2026-10-12  
 Reference: read-only `lib/armeabi/libKyotoLife.so` from the master APK  
 Method: static ARM Thumb disassembly with LLVM; no APK modification
