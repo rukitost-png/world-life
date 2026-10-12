@@ -1,6 +1,6 @@
 # Next Execution Plan — Legacy Map/Texture Compatibility
 
-Date: 2026-10-11
+Date: 2026-10-12
 Status: investigation plan; no runtime compatibility claim
 
 ## Purpose
@@ -24,7 +24,8 @@ Convert the current static-analysis findings into a controlled, falsifiable inve
 - Added synthetic regression cases for invalid record size, missing inner NBC header, a truncated type-2 record header, and a valid record followed by a malformed record.
 - Found and fixed a classification gap: a stream with at least one valid texture followed by a malformed record could previously be labeled verified if the valid records satisfied the size invariants. Classification now also requires `record_error` to be absent.
 - Short type-2 payloads are now retained for diagnostics instead of being ignored solely because they are shorter than 20 bytes.
-- The latest code/test edits are committed, but no passing CI result has been independently observed for these commits in this session. Local GitHub access is unavailable, so treat these tests as **added but pending execution/CI confirmation**.
+- GitHub Actions run [38186726149](https://github.com/rukitost-png/world-life/actions/runs/38186726149) passed on commit `70acb414ff61a1ae40d1536f6c4d58c5d7c5a9a2` (2026-10-12 UTC). The catalog guardrails and full Python unittest discovery step completed successfully.
+- The successful run exposed why fixture review matters: the synthetic `text1000` fixtures packed the six 16-bit fields and the 32-bit data offset as one combined structure, shifting the offset bytes. The fixtures now encode six 16-bit fields, the 32-bit offset `28`, four reserved bytes, and pixel data in the observed 28-byte layout. This corrects tests, not the interpretation of the original APK.
 - WP4 remains partial: synthetic malformed-record diagnostics are improved, but a complete synthetic round-trip fixture and validation against the original runtime are not done.
 
 ## Work packages
