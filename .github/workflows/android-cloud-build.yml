@@ -1,0 +1,116 @@
+name: Android cloud build
+
+on:
+  workflow_dispatch:
+  push:
+    paths:
+      - "app/**"
+      - "**/build.gradle"
+      - "**/build.gradle.kts"
+      - "settings.gradle"
+      - "settings.gradle.kts"
+      - "gradlew"
+      - "gradle/**"
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python for repository audits
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Run existing asset and format tests
+        run: python -m unittest discover -s tests -v
+
+      - name: Set up Java for Android builds
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: "17"
+
+      - name: Detect an actual Android Gradle project
+        id: detect
+        shell: bash
+        run: |
+          set -euo pipefail
+          if [[ -f "./gradlew" ]]; then
+            echo "buildable=true" >> "$GITHUB_OUTPUT"
+            echo "wrapper=true" >> "$GITHUB_OUTPUT"
+          elif find . -type f \( -name build.gradle -o -name build.gradle.kts \) -not -path './.git/*' -print -quit | grep -q .; then
+            echo "buildable=true" >> "$GITHUB_OUTPUT"
+            echo "wrapper=false" >> "$GITHUB_OUTPUT"
+          else
+            echo "buildable=false" >> "$GITHUB_OUTPUT"
+            echo "wrapper=false" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Explain missing Android project inputs
+        if: steps.detect.outputs.buildable != 'true'
+        shell: bash
+        run: |
+          {
+            echo "## Android cloud build blocked — no Android project source"
+            echo
+            echo "The repository's current contents are reverse-engineering notes, asset audits, and tests. It does not contain an Android Gradle project or the master APK."
+            echo
+            echo "This workflow deliberately does not create a fake APK or repackage the untouched master and label it as a restored game."
+            echo
+            echo "Required next input: make the Android project source available in this repository, or enable the GitHub App's access to the private repository that holds the build inputs. Keep the master APK and any signing material private."
+            echo
+            echo "The master APK in ChatGPT Library is not automatically accessible to GitHub Actions."
+          } >> "$GITHUB_STEP_SUMMARY"
+          echo "::error::No Android Gradle project found. No APK was produced. See the job summary for the exact blocker."
+          exit 1
+
+      - name: Set up Gradle
+        if: steps.detect.outputs.buildable == 'true' && steps.detect.outputs.wrapper != 'true'
+        uses: gradle/actions/setup-gradle@v4
+
+      - name: Build debug APK
+        if: steps.detect.outputs.buildable == 'true'
+        shell: bash
+        run: |
+          set -euo pipefail
+          if [[ "${{ steps.detect.outputs.wrapper }}" == "true" ]]; then
+            chmod +x ./gradlew
+            ./gradlew --no-daemon assembleDebug
+          else
+            gradle --no-daemon assembleDebug
+          fi
+
+      - name: Validate APK output
+        if: steps.detect.outputs.buildable == 'true'
+        shell: bash
+        run: |
+          set -euo pipefail
+          mapfile -t apks < <(find . -type f -path '*/build/outputs/apk/*/*.apk' -not -path './.git/*' | sort)
+          if [[ "${#apks[@]}" -eq 0 ]]; then
+            echo "::error::Gradle completed but produced no APK in build/outputs/apk."
+            exit 1
+          fi
+          for apk in "${apks[@]}"; do
+            unzip -t "$apk" >/dev/null
+            if ! unzip -l "$apk" | grep -q 'AndroidManifest.xml'; then
+              echo "::error::APK archive has no AndroidManifest.xml: $apk"
+              exit 1
+            fi
+            sha256sum "$apk"
+          done
+
+      - name: Upload debug APK artifact
+        if: success() && steps.detect.outputs.buildable == 'true'
+        uses: actions/upload-artifact@v4
+        with:
+          name: world-life-debug-apk
+          path: "**/build/outputs/apk/**/*.apk"
+          if-no-files-found: error
+          retention-days: 7
